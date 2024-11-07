@@ -3,13 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-pdf/renderer": "^4.0.0",
+    "@sendgrid/mail": "^8.1.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "lucide-react": "^0.454.0",
+    "meyda": "^5.6.3",
+    "openai": "^4.70.2",
+    "path-browserify": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
+    "recorder-js": "^1.0.7",
+    "recordrtc": "^5.6.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
