@@ -3,10 +3,14 @@
     margin: 100px auto;
     padding: 20px;
     border: 1px solid #ddd;
+    justify-items: center;
     border-radius: 5px;
     background-color: #f9f9f9;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     /* text-align: center; */
+}
+.loadingIcon {
+  justify-items: center;
 }
 
 .saveProfile{

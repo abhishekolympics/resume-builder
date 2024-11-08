@@ -1,19 +1,23 @@
-import React from 'react';
-import './navbar.css';
+import React from "react";
+import "./navbar.css";
 
-const Navbar = ({ username, onLogout, onCreateTask }) => {
+const Navbar = ({ username, onLogout, showLogout, onCreateTask }) => {
   return (
     <nav className="navbar">
-      <div className="navbar-left">
-        <button onClick={onCreateTask}>User Profile</button>
-      </div>
+      {showLogout ?? (
+        <div className="navbar-left">
+          <button onClick={onCreateTask}>User Profile</button>
+        </div>
+      )}
       <div className="navbar-center">
         <h1 className="navbar-title">Jobs</h1>
       </div>
-      <div className="navbar-right">
-        <span>{username}</span>
-        <button onClick={onLogout}>Logout</button>
-      </div>
+      {showLogout ?? (
+        <div className="navbar-right">
+          <span>{username}</span>
+          <button onClick={onLogout}>Logout</button>
+        </div>
+      )}
     </nav>
   );
 };

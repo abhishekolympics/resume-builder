@@ -3,10 +3,10 @@ import axios from "axios";
 import "./Auth.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const Register = ({ newStoredEmail }) => {
+const Register = ({ receivedEmail }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const storedEmail = location.state?.storedEmail || "";
+  const storedEmail = location.state?.receivedEmail || "";
 
   const [email, setEmail] = useState(storedEmail);
   const [password, setPassword] = useState("");
@@ -37,6 +37,7 @@ const Register = ({ newStoredEmail }) => {
       );
     }
   };
+  console.log('email inside register=',storedEmail);
 
   return (
     <div className="auth-container">
