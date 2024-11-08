@@ -10,7 +10,7 @@ dotStream.register();
 function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   const location = useLocation();
   const receivedEmail = location.state?.storedEmail;
-  const [isLoggedIn,setIsLoggedIn]= useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate();
   const searchTerm = "web developer";
@@ -31,21 +31,25 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
     setJobs(response.data);
   }
 
-  console.log("jobs in jobs page=", jobs);
+  function goToProfilePage() {
+    navigate('/profile');
+  }
 
   useEffect(() => {
     getJobs();
-    if(receivedEmail)
+
+    if (receivedEmail) {
       setIsLoggedIn(true);
-  }, [searchTerm,isLoggedIn]);
+    }
+  }, [searchTerm, isLoggedIn]);
 
   return (
-    <div>
+    <div className="outerDiv">
       <Navbar
         username={name}
         onLogout={getJobs}
         showLogout={isLoggedIn}
-        onCreateTask={() => setShowPopup(true)}
+        goToProfilePage={goToProfilePage}
       />
 
       <div className="jobsPage">
@@ -68,10 +72,13 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
           </ol>
         )}
       </div>
-      <div className="saveProfile">
-        <p>Want to save your details?</p>
-        <button onClick={onClickHandler}>SAVE</button>
-      </div>
+
+      {!isLoggedIn && (
+        <div className="saveProfile">
+          <p>Want to save your details?</p>
+          <button onClick={onClickHandler}>SAVE</button>
+        </div>
+      )}
     </div>
   );
 }
