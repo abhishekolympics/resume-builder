@@ -57,6 +57,7 @@ async function scrapeJobs(searchTerm) {
       return jobData;
     }
     const newJobData = await scrapeGlassdoor(page, searchTerm);
+    console.log("glassdoor function returned this=", newJobData);
     console.log("Navigating to Indeed...");
     await page.goto(
       `https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`,
