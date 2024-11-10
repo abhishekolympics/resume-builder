@@ -48,6 +48,7 @@ function Profile() {
       .catch((error) => {
         console.log("error=", error.message);
         showLogin.current = true;
+        navigate('/');
       });
   }
   

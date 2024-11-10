@@ -28,6 +28,7 @@ const Register = ({ receivedEmail }) => {
         navigate("/jobs");
       })
       .catch((error) => {
+        navigate('/');
         console.log("error=", error);
       });
   }

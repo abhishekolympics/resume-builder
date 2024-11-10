@@ -38,6 +38,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   function logoutUser() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
+    navigate('/');
   }
 
   async function checkLogin() {
@@ -52,6 +53,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
         setIsLoggedIn(true);
       })
       .catch((error) => {
+        navigate('/');
         console.log("error=", error);
       });
   }

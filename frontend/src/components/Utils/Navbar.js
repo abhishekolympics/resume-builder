@@ -16,7 +16,6 @@ const Navbar = ({
   onLogin,
   showJobsOnLogin,
 }) => {
-  console.log("showlogin in navbar=", showLogin);
   return (
     <nav className="navbar">
       {showHome && (
