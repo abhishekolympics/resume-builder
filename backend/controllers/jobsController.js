@@ -88,9 +88,11 @@ async function scrapeJobs(searchTerm) {
         });
         return jobs.slice(0, 3);
       });
+      console.log("jobdata inside glassdoor=",jobData);
       return jobData;
     }
     const newJobData = await scrapeGlassdoor(page, searchTerm);
+    console.log("glassdoor function returned this=",newJobData);
     const jobData = await page.evaluate(() => {
       const jobs = [];
       const jobElements = document.querySelectorAll("h2.jobTitle a");
