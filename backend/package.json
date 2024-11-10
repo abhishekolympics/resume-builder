@@ -25,7 +25,8 @@
     "pdfkit": "^0.15.1",
     "puppeteer": "^23.7.1",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "user-agents": "^1.1.354"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",
