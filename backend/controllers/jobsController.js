@@ -155,7 +155,7 @@ async function scrapeJobs(searchTerm) {
 
     // Scrape jobs from all the portals
     const jobData = await Promise.all([
-      scrapeIndeed(page, searchTerm),
+      // scrapeIndeed(page, searchTerm),
       scrapeGlassdoor(page, searchTerm),
       scrapeMonster(page, searchTerm),
       scrapeAdzuna(page, searchTerm),
