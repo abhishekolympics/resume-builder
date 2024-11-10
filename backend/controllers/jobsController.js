@@ -33,14 +33,49 @@ async function scrapeJobs(searchTerm) {
     console.log("User agent set.");
 
     // Navigate to Indeed with the job term
+    // async function scrapeGlassdoor(page, searchTerm) {
+    //   console.log("Scraping jobs from Glassdoor...");
+    //   await page.goto(
+    //     `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encodeURIComponent(
+    //       searchTerm
+    //     )}`,
+    //     { waitUntil: "domcontentloaded" }
+    //   );
+    //   const jobData = await page.evaluate(() => {
+    //     const jobs = [];
+    //     const jobElements = document.querySelectorAll(
+    //       ".heading_Heading__BqX5J.heading_Level1__soLZs"
+    //     );
+    //     jobElements.forEach((element) => {
+    //       const jobTitle = element.innerText.trim();
+    //       const jobUrl = element.closest("a") ? element.closest("a").href : ""; // Get link if exists
+    //       jobs.push({ title: jobTitle, link: jobUrl });
+    //     });
+    //     return jobs.slice(0, 3);
+    //   });
+    //   console.log("jobdata inside glassdoor=", jobData);
+    //   return jobData;
+    // }
+    // const newJobData = await scrapeGlassdoor(page, searchTerm);
+    // console.log("glassdoor function returned this=", newJobData);
     async function scrapeGlassdoor(page, searchTerm) {
       console.log("Scraping jobs from Glassdoor...");
+
       await page.goto(
         `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encodeURIComponent(
           searchTerm
         )}`,
         { waitUntil: "domcontentloaded" }
       );
+
+      // Check if the page is loaded by printing the page title
+      const pageTitle = await page.title();
+      console.log("Page Title:", pageTitle); // This will confirm if the page has loaded
+
+      // You can also log the content of an element to ensure it has loaded
+      const pageContent = await page.content();
+      console.log("Page Content Snippet:", pageContent.slice(0, 200)); // Print a small snippet of the page content to confirm
+
       const jobData = await page.evaluate(() => {
         const jobs = [];
         const jobElements = document.querySelectorAll(
@@ -56,8 +91,10 @@ async function scrapeJobs(searchTerm) {
       console.log("jobdata inside glassdoor=", jobData);
       return jobData;
     }
+
     const newJobData = await scrapeGlassdoor(page, searchTerm);
     console.log("glassdoor function returned this=", newJobData);
+
     console.log("Navigating to Indeed...");
     await page.goto(
       `https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`,
