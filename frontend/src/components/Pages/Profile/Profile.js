@@ -33,30 +33,37 @@ function Profile() {
       [name]: value,
     });
   };
-  async function checkLogin() {
-    const token = localStorage.getItem("token");
-    await axios
-      .get("http://localhost:5000/api/verification/verifyUser", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Send token in Authorization header
-        },
-      })
-      .then(() => {
-        showLogout.current = true;
-        showLogin.current = false;
-      })
-      .catch((error) => {
-        console.log("error=", error.message);
-        showLogin.current = true;
-        navigate('/');
-      });
-  }
-  
+
   useEffect(() => {
+    async function checkLogin() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token available, skipping verification.");
+        navigate("/");
+      }
+      await axios
+        .get(
+          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Send token in Authorization header
+            },
+          }
+        )
+        .then(() => {
+          showLogout.current = true;
+          showLogin.current = false;
+        })
+        .catch((error) => {
+          console.log("error=", error.message);
+          showLogin.current = true;
+          navigate("/");
+        });
+    }
     async function getData() {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/resume/profile",
+          "https://resume-builder-production-1d7b.up.railway.appapi/resume/profile",
           {
             params: { email: initialEmail.current }, // Use the email from useRef
           }
@@ -83,10 +90,10 @@ function Profile() {
         console.error("Error fetching profile data", error);
       }
     }
-    
+
     checkLogin();
     getData();
-  }, []); // Empty array ensures it only runs once
+  }, [navigate]); // Empty array ensures it only runs once
 
   function handleJobs() {
     navigate("/jobs");

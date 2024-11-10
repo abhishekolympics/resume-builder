@@ -15,7 +15,6 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   const navigate = useNavigate();
   const searchTerm = "web developer";
   const [jobs, setJobs] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
   const onClickHandler = () => {
     navigate("/register", { state: { receivedEmail } });
   };
@@ -25,9 +24,12 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   };
 
   async function getJobs() {
-    const response = await axios.get("http://localhost:5000/api/find/jobs", {
-      params: { searchTerm },
-    });
+    const response = await axios.get(
+      "https://resume-builder-production-1d7b.up.railway.app/api/find/jobs",
+      {
+        params: { searchTerm },
+      }
+    );
     setJobs(response.data);
   }
 
@@ -38,33 +40,42 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   function logoutUser() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    navigate('/');
+    navigate("/");
   }
 
-  async function checkLogin() {
-    const token = localStorage.getItem("token");
-    const response = await axios
-      .get("http://localhost:5000/api/verification/verifyUser", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Send token in Authorization header
-        },
-      })
-      .then(() => {
-        setIsLoggedIn(true);
-      })
-      .catch((error) => {
-        navigate('/');
-        console.log("error=", error);
-      });
-  }
   useEffect(() => {
+    console.log("useEffect is sending these requests.");
+    async function checkLogin() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token available, skipping verification.");
+        navigate("/");
+      }
+
+      await axios
+        .get(
+          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Send token in Authorization header
+            },
+          }
+        )
+        .then(() => {
+          setIsLoggedIn(true);
+        })
+        .catch((error) => {
+          navigate("/");
+          console.log("error=", error);
+        });
+    }
     getJobs();
     checkLogin();
 
     if (receivedEmail) {
       setIsLoggedIn(true);
     }
-  }, [searchTerm, isLoggedIn]);
+  }, [searchTerm, isLoggedIn,navigate,receivedEmail]);
 
   function onLogin() {
     receivedEmail = "onthewayabhishek@gmail.com";

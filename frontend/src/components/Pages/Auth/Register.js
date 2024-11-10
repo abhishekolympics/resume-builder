@@ -18,17 +18,24 @@ const Register = ({ receivedEmail }) => {
 
   async function checkLogin() {
     const token = localStorage.getItem("token");
-    const response = await axios
-      .get("http://localhost:5000/api/verification/verifyUser", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Send token in Authorization header
-        },
-      })
+    if (!token) {
+      console.log("No token available, skipping verification.");
+      return; // Skip the verification if there's no token
+    }
+    await axios
+      .get(
+        "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Send token in Authorization header
+          },
+        }
+      )
       .then(() => {
         navigate("/jobs");
       })
       .catch((error) => {
-        navigate('/');
+        navigate("/");
         console.log("error=", error);
       });
   }
@@ -45,7 +52,7 @@ const Register = ({ receivedEmail }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://resume-builder-production-1d7b.up.railway.app/api/auth/register",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);

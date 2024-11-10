@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Auth.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -11,27 +11,37 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  async function checkLogin() {
-    const token = localStorage.getItem("token");
-    const response = await axios
-      .get("http://localhost:5000/api/verification/verifyUser", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Send token in Authorization header
-        },
-      })
-      .then(() => {
-        navigate("/jobs");
-      })
-      .catch((error) => {
-        console.log("error=", error);
-      });
-  }
-  checkLogin();
+  useEffect(() => {
+    async function checkLogin() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token available, skipping verification.");
+        return; // Skip the verification if there's no token
+      }
+      await axios
+        .get(
+          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Send token in Authorization header
+            },
+            withCredentials: true,
+          }
+        )
+        .then(() => {
+          navigate("/jobs");
+        })
+        .catch((error) => {
+          console.log("error=", error);
+        });
+    }
+    checkLogin();
+  }, [navigate]);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://resume-builder-production-1d7b.up.railway.app/api/auth/login",
         {
           email,
           password,
