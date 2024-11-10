@@ -31,9 +31,14 @@ app.use("/api/find", jobsRoutes);
 app.use("/api/verification", tokenRoute);
 
 // Home route
-app.get("/api/find", (req, res) => {
-  res.send("Welcome to the Resume Builder API!");
-});
+try {
+  app.get("/api/find", (req, res) => {
+    console.log("well hello there");
+    res.send("Welcome to the Resume Builder API!");
+  });
+} catch (error) {
+  console.log("error=", error);
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
