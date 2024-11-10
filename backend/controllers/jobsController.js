@@ -7,7 +7,7 @@ async function scrapeJobs(searchTerm) {
   try {
     console.log('Launching browser...');
     browser = await puppeteer.launch({
-      headless: true, // Keep it headless
+      headless: false, // Switch to headful mode to avoid potential issues in cloud environments
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -26,7 +26,7 @@ async function scrapeJobs(searchTerm) {
     // Set a realistic viewport size and user agent
     await page.setViewport({ width: 1280, height: 800 });
     console.log('Viewport set to 1280x800.');
-    
+
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     );
@@ -34,10 +34,11 @@ async function scrapeJobs(searchTerm) {
 
     // Navigate to Indeed with the job term
     console.log('Navigating to Indeed...');
-    await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
+    const response = await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
       waitUntil: 'domcontentloaded',
+      timeout: 60000, // Increase the timeout to 60 seconds
     });
-    console.log(`Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)} completed.`);
+    console.log(`Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)} completed with status: ${response.status()}`);
 
     // Wait for job elements to load
     console.log('Waiting for job title selector...');
@@ -86,21 +87,4 @@ async function scrapeJobs(searchTerm) {
   }
 }
 
-
-// Controller function for handling the API endpoint
-async function getJobs(req, res) {
-  const { searchTerm } = req.query;
-  if (!searchTerm) {
-    return res.status(400).json({ error: 'Search term is required' });
-  }
-
-  try {
-    const jobs = await scrapeJobs(searchTerm);
-    res.json(jobs);
-  } catch (error) {
-    console.error('Error scraping jobs:', error.message);
-    res.status(500).json({ error: 'Failed to scrape jobs', details: error.message });
-  }
-}
-
-module.exports = { getJobs };
+module.exports = { scrapeJobs };
