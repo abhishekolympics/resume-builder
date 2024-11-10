@@ -4,9 +4,11 @@ const puppeteer = require('puppeteer');
 const USER_AGENTS = [
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
 ];
+
+// Helper function for delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function getRandomUserAgent() {
   return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
@@ -27,11 +29,8 @@ async function scrapeJobs(searchTerm) {
         '--disable-accelerated-2d-canvas',
         '--disable-gpu',
         '--window-size=1920,1080',
-        '--hide-scrollbars',
         '--disable-notifications',
-        '--disable-extensions',
-        '--proxy-server="direct://"',
-        '--proxy-bypass-list=*'
+        '--disable-extensions'
       ]
     });
 
@@ -48,15 +47,8 @@ async function scrapeJobs(searchTerm) {
     // Set up browser environment to appear more human-like
     await page.setExtraHTTPHeaders({
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-      'Accept-Encoding': 'gzip, deflate, br',
       'Accept-Language': 'en-US,en;q=0.9',
-      'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'none',
-      'Sec-Fetch-User': '?1',
-      'Upgrade-Insecure-Requests': '1',
       'sec-ch-ua': '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"Windows"'
@@ -66,61 +58,58 @@ async function scrapeJobs(searchTerm) {
     const userAgent = await getRandomUserAgent();
     await page.setUserAgent(userAgent);
 
-    // Enable JavaScript
-    await page.setJavaScriptEnabled(true);
-
-    // Add browser permissions
-    const context = browser.defaultBrowserContext();
-    await context.overridePermissions('https://in.indeed.com', [
-      'geolocation',
-      'notifications'
-    ]);
-
     console.log('Navigating to Indeed...');
     
-    // First visit Indeed homepage to get necessary cookies
+    // First visit Indeed homepage
     await page.goto('https://in.indeed.com', {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
 
-    // Wait for a bit to seem more human-like
-    await page.waitForTimeout(2000);
+    // Wait for a bit
+    await delay(2000);
 
     // Now navigate to the search page
     const searchUrl = `https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}&l=`;
-    await page.goto(searchUrl, {
+    const response = await page.goto(searchUrl, {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
 
-    // Wait for job cards to load
-    const jobCardSelectors = [
+    if (!response.ok()) {
+      throw new Error(`Failed to load page: ${response.status()}`);
+    }
+
+    // Wait for job cards to load using a more reliable approach
+    const jobSelectors = [
       '.job_seen_beacon',
       '.resultContent',
       '[data-testid="jobCard"]',
       '.jobsearch-ResultsList > div'
     ];
 
-    let jobElements = null;
-    for (const selector of jobCardSelectors) {
+    let foundSelector = null;
+    for (const selector of jobSelectors) {
       try {
         await page.waitForSelector(selector, { timeout: 5000 });
-        jobElements = await page.$$(selector);
-        if (jobElements.length > 0) break;
+        const elements = await page.$$(selector);
+        if (elements.length > 0) {
+          foundSelector = selector;
+          break;
+        }
       } catch (e) {
-        console.log(`Selector ${selector} not found, trying next...`);
+        continue;
       }
     }
 
-    if (!jobElements || jobElements.length === 0) {
+    if (!foundSelector) {
       throw new Error('No job elements found on the page');
     }
 
     // Extract job data
-    const jobData = await page.evaluate(() => {
+    const jobData = await page.evaluate((selector) => {
       const jobs = [];
-      const jobCards = document.querySelectorAll('.job_seen_beacon, .resultContent, [data-testid="jobCard"]');
+      const jobCards = document.querySelectorAll(selector);
       
       jobCards.forEach(card => {
         try {
@@ -140,7 +129,7 @@ async function scrapeJobs(searchTerm) {
       });
       
       return jobs.slice(0, 3);
-    });
+    }, foundSelector);
 
     await browser.close();
     console.log('Successfully scraped jobs:', jobData.length);
