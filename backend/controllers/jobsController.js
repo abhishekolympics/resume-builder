@@ -1,64 +1,91 @@
 const puppeteer = require('puppeteer');
 
-// Function to scrape job listings from Indeed
 async function scrapeJobs(searchTerm) {
-  const browser = await puppeteer.launch({
-    headless: false, // Set to false to run in non-headless mode for debugging
-    args: ['--no-sandbox', '--disable-setuid-sandbox'], // To avoid sandbox issues
-  });
-  const page = await browser.newPage();
+  console.log('Starting Puppeteer scraping for search term:', searchTerm);
 
-  // Set a realistic viewport size and user agent
-  await page.setViewport({ width: 1280, height: 800 });
-  await page.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-  );
+  let browser;
+  try {
+    console.log('Launching browser...');
+    browser = await puppeteer.launch({
+      headless: true, // Keep it headless
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--remote-debugging-port=9222',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-software-rasterizer', // Ensure it works without GPU
+      ],
+    });
+    console.log('Browser launched successfully.');
 
-  // Navigate to Indeed with the job term
-  await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
-    waitUntil: 'domcontentloaded', // Change to 'domcontentloaded' for more reliable content loading
-  });
+    const page = await browser.newPage();
+    console.log('New page created.');
 
-  // Debugging: Log the page content to inspect HTML structure
-  const pageContent = await page.content();
-  console.log(pageContent);  // Log the HTML for inspection
+    // Set a realistic viewport size and user agent
+    await page.setViewport({ width: 1280, height: 800 });
+    console.log('Viewport set to 1280x800.');
+    
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    );
+    console.log('User agent set.');
 
-  // Wait for job elements to load, with retries
-  let retryAttempts = 3;
-  while (retryAttempts > 0) {
+    // Navigate to Indeed with the job term
+    console.log('Navigating to Indeed...');
+    await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    console.log(`Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)} completed.`);
+
+    // Wait for job elements to load
+    console.log('Waiting for job title selector...');
     try {
       await page.waitForSelector('h2.jobTitle a', { timeout: 60000 });
-      break; // Exit loop if successful
+      console.log('Job title selector found.');
     } catch (error) {
-      retryAttempts--;
-      console.log(`Retrying... (${3 - retryAttempts} attempt(s) left)`);
-      if (retryAttempts === 0) {
-        console.error('Job title selector not found after retries');
-        await browser.close();
-        throw error; // Throw error if retries are exhausted
-      }
+      console.error('Job title selector not found:', error);
+      return [];
     }
-  }
 
-  // Scrape job post titles and URLs
-  const jobData = await page.evaluate(() => {
-    const jobs = [];
-    const jobElements = document.querySelectorAll('h2.jobTitle a');
-    
-    jobElements.forEach((element) => {
-      const relativeUrl = element.getAttribute('href'); // Get the relative URL
-      const absoluteUrl = `https://in.indeed.com${relativeUrl}`; // Construct the absolute URL
-      const jobTitle = element.innerText.trim(); // Get the job title
+    // Scrape job post titles and URLs
+    console.log('Scraping job titles and URLs...');
+    const jobData = await page.evaluate(() => {
+      const jobs = [];
+      const jobElements = document.querySelectorAll('h2.jobTitle a');
+      
+      if (jobElements.length === 0) {
+        console.log('No job elements found.');
+      }
 
-      jobs.push({ title: jobTitle, link: absoluteUrl });
+      jobElements.forEach((element) => {
+        const relativeUrl = element.getAttribute('href'); // Get the relative URL
+        const absoluteUrl = `https://in.indeed.com${relativeUrl}`; // Construct the absolute URL
+        const jobTitle = element.innerText.trim(); // Get the job title
+
+        jobs.push({ title: jobTitle, link: absoluteUrl });
+      });
+
+      console.log(`Scraped ${jobs.length} job listings.`);
+      return jobs.slice(0, 3); // Return the first three job listings with title and link
     });
-    
-    return jobs.slice(0, 3); // Return the first three job listings with title and link
-  });
 
-  await browser.close();
-  return jobData;
+    console.log('Job scraping completed.');
+
+    await browser.close();
+    console.log('Browser closed.');
+
+    return jobData;
+  } catch (error) {
+    console.error('Error during job scraping process:', error);
+    if (browser) {
+      await browser.close();
+    }
+    return [];
+  }
 }
+
 
 // Controller function for handling the API endpoint
 async function getJobs(req, res) {
