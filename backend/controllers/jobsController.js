@@ -114,7 +114,7 @@ async function scrapeJobs(searchTerm) {
   try {
     console.log('Launching browser...');
     browser = await puppeteer.launch({
-      headless: true, // Keep it headless
+      headless: false, // Keep it headless
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
