@@ -87,4 +87,22 @@ async function scrapeJobs(searchTerm) {
   }
 }
 
-module.exports = { scrapeJobs };
+
+
+// Controller function for handling the API endpoint
+async function getJobs(req, res) {
+  const { searchTerm } = req.query;
+  if (!searchTerm) {
+    return res.status(400).json({ error: 'Search term is required' });
+  }
+
+  try {
+    const jobs = await scrapeJobs(searchTerm);
+    res.json(jobs);
+  } catch (error) {
+    console.error('Error scraping jobs:', error.message);
+    res.status(500).json({ error: 'Failed to scrape jobs', details: error.message });
+  }
+}
+
+module.exports = { getJobs };
