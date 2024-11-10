@@ -24,7 +24,7 @@ const Home = () => {
   const maxRecordingTimeoutRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const processingResultsRef = useRef([]);
-  const [showUserName,setShowUserName] = useState(false);
+  const [showUserName, setShowUserName] = useState(false);
 
   const MAX_RECORDING_TIME = 10000; // 2 seconds maximum recording time
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
@@ -224,12 +224,14 @@ const Home = () => {
     }
   };
 
+  function handleOnLogin() {
+    navigate('/login');
+  }
+
   return (
     <div className="homePage">
-      <Navbar
-        pageName = {'Home'}
-      />
-      <h1>AI Conversation Assistant</h1>
+      <Navbar pageName={"Home"} showLogin={true} onLogin={handleOnLogin} />
+      <h1>AI Resume Generator</h1>
 
       <div>
         <button onClick={startConversation} disabled={isActive}>

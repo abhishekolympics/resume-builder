@@ -11,7 +11,9 @@ const Navbar = ({
   showJobs,
   handleJobs,
   showHome,
-  handleHome
+  handleHome,
+  showLogin,
+  onLogin
 }) => {
   return (
     <nav className="navbar">
@@ -37,6 +39,12 @@ const Navbar = ({
         <div className="navbar-right">
           <span>{username}</span>
           <button onClick={onLogout}>Logout</button>
+        </div>
+      )}
+      {showLogin && (
+        <div className="navbar-right">
+          <span>{username}</span>
+          <button onClick={onLogin}>Login</button>
         </div>
       )}
     </nav>
