@@ -20,6 +20,8 @@ function Profile() {
     contact: "onthewayabhishek@gmail.com",
   });
 
+  const showLogout = useRef(false);
+
   // Only useRef for values that are persistent but don't need to trigger re-renders
   const initialEmail = useRef("oonthewayabhishek@gmail.com");
 
@@ -30,6 +32,22 @@ function Profile() {
       [name]: value,
     });
   };
+  async function checkLogin() {
+    const token = localStorage.getItem("token");
+    const response = await axios
+      .get("http://localhost:5000/api/verification/verifyUser", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
+      .then(() => {
+        showLogout.current = true;
+      })
+      .catch((error) => {
+        console.log("error=", error);
+      });
+  }
+  checkLogin();
 
   useEffect(() => {
     async function getData() {
@@ -67,12 +85,17 @@ function Profile() {
   }, []); // Empty array ensures it only runs once
 
   function handleJobs() {
-    navigate('/jobs');
+    navigate("/jobs");
+  }
+
+  function onLogout() {
+    localStorage.removeItem('token');
+    showLogout.current=false;
   }
 
   return (
     <div className="main-profile-container">
-      <Navbar pageName={"Profile"} showJobs={true} handleJobs={handleJobs} />
+      <Navbar pageName={"Profile"} showJobs={true} handleJobs={handleJobs} showLogout={showLogout.current} onLogout={onLogout} />
       <div className="profile-container">
         <h2>Profile Page</h2>
         <form className="profile-form">
