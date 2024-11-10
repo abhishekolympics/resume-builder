@@ -33,6 +33,30 @@ async function scrapeJobs(searchTerm) {
     console.log("User agent set.");
 
     // Navigate to Indeed with the job term
+    async function scrapeGlassdoor(page, searchTerm) {
+      console.log("Scraping jobs from Glassdoor...");
+      await page.goto(
+        `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encodeURIComponent(
+          searchTerm
+        )}`,
+        { waitUntil: "domcontentloaded" }
+      );
+      const jobData = await page.evaluate(() => {
+        const jobs = [];
+        const jobElements = document.querySelectorAll(
+          ".heading_Heading__BqX5J.heading_Level1__soLZs"
+        );
+        jobElements.forEach((element) => {
+          const jobTitle = element.innerText.trim();
+          const jobUrl = element.closest("a") ? element.closest("a").href : ""; // Get link if exists
+          jobs.push({ title: jobTitle, link: jobUrl });
+        });
+        return jobs.slice(0, 3);
+      });
+      console.log("jobdata inside glassdoor=", jobData);
+      return jobData;
+    }
+    const newJobData = await scrapeGlassdoor(page, searchTerm);
     console.log("Navigating to Indeed...");
     await page.goto(
       `https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`,
@@ -68,31 +92,7 @@ async function scrapeJobs(searchTerm) {
 
     // Scrape job post titles and URLs
     console.log("Scraping job titles and URLs...");
-    async function scrapeGlassdoor(page, searchTerm) {
-      console.log("Scraping jobs from Glassdoor...");
-      await page.goto(
-        `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encodeURIComponent(
-          searchTerm
-        )}`,
-        { waitUntil: "domcontentloaded" }
-      );
-      const jobData = await page.evaluate(() => {
-        const jobs = [];
-        const jobElements = document.querySelectorAll(
-          ".heading_Heading__BqX5J.heading_Level1__soLZs"
-        );
-        jobElements.forEach((element) => {
-          const jobTitle = element.innerText.trim();
-          const jobUrl = element.closest("a") ? element.closest("a").href : ""; // Get link if exists
-          jobs.push({ title: jobTitle, link: jobUrl });
-        });
-        return jobs.slice(0, 3);
-      });
-      console.log("jobdata inside glassdoor=",jobData);
-      return jobData;
-    }
-    const newJobData = await scrapeGlassdoor(page, searchTerm);
-    console.log("glassdoor function returned this=",newJobData);
+    console.log("glassdoor function returned this=", newJobData);
     const jobData = await page.evaluate(() => {
       const jobs = [];
       const jobElements = document.querySelectorAll("h2.jobTitle a");
