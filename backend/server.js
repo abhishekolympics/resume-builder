@@ -3,7 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const emailRoutes = require("./routes/emailRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
-const authRoutes = require("./Routes/authRoutes");
+const authRoutes = require("./routes/authRoutes");
 const jobsRoutes = require("./routes/jobRoutes");
 const tokenRoute = require("./routes/tokenRoute");
 
