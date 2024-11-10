@@ -10,7 +10,13 @@ const tokenRoute = require("./routes/tokenRoute");
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: 'https://resume-builder-production-1d7b.up.railway.app/',
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Connect to the database
