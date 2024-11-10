@@ -12,7 +12,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -22,6 +22,7 @@ app.use(express.json());
 // Connect to the database
 connectDB();
 
+app.options("*", cors());
 // Routes
 app.use("/api/email", emailRoutes);
 app.use("/api/resume", resumeRoutes);
