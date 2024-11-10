@@ -3,8 +3,9 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const emailRoutes = require("./routes/emailRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
-const authRoutes = require("./Routes/routes");
-const jobsRoutes = require('./routes/jobRoutes');
+const authRoutes = require("./Routes/authRoutes");
+const jobsRoutes = require("./routes/jobRoutes");
+const tokenRoute = require("./routes/tokenRoute");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/email", emailRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/find", jobsRoutes);
+app.use("/api/verification", tokenRoute);
 
 // Home route
 app.get("/api/find", (req, res) => {

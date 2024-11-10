@@ -23,4 +23,4 @@ const shareProfile = async (req, res) => {
   }
 };
 
-module.exports = { shareProfile };
+module.exports = shareProfile;
