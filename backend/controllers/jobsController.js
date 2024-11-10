@@ -7,7 +7,7 @@ async function scrapeJobs(searchTerm) {
   try {
     console.log('Launching browser...');
     browser = await puppeteer.launch({
-      headless: false, // Switch to headful mode to avoid potential issues in cloud environments
+      headless: true, // Keep it headless
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -26,7 +26,7 @@ async function scrapeJobs(searchTerm) {
     // Set a realistic viewport size and user agent
     await page.setViewport({ width: 1280, height: 800 });
     console.log('Viewport set to 1280x800.');
-
+    
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     );
@@ -34,11 +34,10 @@ async function scrapeJobs(searchTerm) {
 
     // Navigate to Indeed with the job term
     console.log('Navigating to Indeed...');
-    const response = await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
+    await page.goto(`https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`, {
       waitUntil: 'domcontentloaded',
-      timeout: 60000, // Increase the timeout to 60 seconds
     });
-    console.log(`Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)} completed with status: ${response.status()}`);
+    console.log(`Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)} completed.`);
 
     // Wait for job elements to load
     console.log('Waiting for job title selector...');
@@ -86,7 +85,6 @@ async function scrapeJobs(searchTerm) {
     return [];
   }
 }
-
 
 
 // Controller function for handling the API endpoint
