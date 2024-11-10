@@ -32,7 +32,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   }
 
   function goToProfilePage() {
-    navigate('/profile');
+    navigate("/profile");
   }
 
   useEffect(() => {
@@ -47,6 +47,8 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
     <div className="outerDiv">
       <Navbar
         username={name}
+        showProfile={true}
+        pageName="Jobs"
         onLogout={getJobs}
         showLogout={isLoggedIn}
         goToProfilePage={goToProfilePage}

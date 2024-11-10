@@ -1,16 +1,37 @@
 import React from "react";
 import "./navbar.css";
 
-const Navbar = ({ username, onLogout, showLogout, goToProfilePage }) => {
+const Navbar = ({
+  username,
+  showProfile,
+  pageName,
+  onLogout,
+  showLogout,
+  goToProfilePage,
+  showJobs,
+  handleJobs,
+  showHome,
+  handleHome
+}) => {
   return (
     <nav className="navbar">
-      {showLogout && (
+      {showHome && (
+        <div className="navbar-left">
+          <button onClick={handleHome}>Home</button>
+        </div>
+      )}
+      {showProfile && (
         <div className="navbar-left">
           <button onClick={goToProfilePage}>User Profile</button>
         </div>
       )}
+      {showJobs && (
+        <div className="navbar-left">
+          <button onClick={handleJobs}>Jobs</button>
+        </div>
+      )}
       <div className="navbar-center">
-        <h1 className="navbar-title">Jobs</h1>
+        <h1 className="navbar-title">{pageName}</h1>
       </div>
       {showLogout && (
         <div className="navbar-right">

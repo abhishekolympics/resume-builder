@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Auth.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import Navbar from "../../Utils/Navbar";
 
 const Register = ({ receivedEmail }) => {
   const location = useLocation();
@@ -12,7 +13,6 @@ const Register = ({ receivedEmail }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
-
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -37,10 +37,15 @@ const Register = ({ receivedEmail }) => {
       );
     }
   };
-  console.log('email inside register=',storedEmail);
+  console.log("email inside register=", storedEmail);
+
+  function handleJobs() {
+    navigate('/jobs');
+  }
 
   return (
     <div className="auth-container">
+      <Navbar pageName={"Register"} showJobs={true} handleJobs={handleJobs} />
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
         <input

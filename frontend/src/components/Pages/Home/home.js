@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
 
-import speakQuestion from "../ai/speakQuestion";
-import stopRecording from "../audio/stopRecording";
-import startRecording from "../audio/startRecording";
-import cleanup from "../Utils/cleanup";
-import RecordingGif from "../../assets/rec.gif";
-import BotSpeaking from "../../assets/bot.gif";
+import speakQuestion from "../../ai/speakQuestion";
+import stopRecording from "../../audio/stopRecording";
+import startRecording from "../../audio/startRecording";
+import cleanup from "../../Utils/cleanup";
+import RecordingGif from "../../../assets/rec.gif";
+import BotSpeaking from "../../../assets/bot.gif";
+import Navbar from "../../Utils/Navbar";
 import "./home.css";
 
 const Home = () => {
@@ -23,6 +24,7 @@ const Home = () => {
   const maxRecordingTimeoutRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const processingResultsRef = useRef([]);
+  const [showUserName,setShowUserName] = useState(false);
 
   const MAX_RECORDING_TIME = 10000; // 2 seconds maximum recording time
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
@@ -224,6 +226,9 @@ const Home = () => {
 
   return (
     <div className="homePage">
+      <Navbar
+        pageName = {'Home'}
+      />
       <h1>AI Conversation Assistant</h1>
 
       <div>
