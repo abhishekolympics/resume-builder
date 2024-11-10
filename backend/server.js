@@ -12,7 +12,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: 'https://resume-builder-production-1d7b.up.railway.app/',
+    origin: 'https://localhost:3000',
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
