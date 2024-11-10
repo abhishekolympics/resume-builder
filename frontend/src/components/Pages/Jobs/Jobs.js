@@ -35,8 +35,30 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
     navigate("/profile");
   }
 
+  function logoutUser() {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+
+  }
+
+  async function checkLogin() {
+    const token = localStorage.getItem("token");
+    const response = await axios
+      .get("http://localhost:5000/api/verification/verifyUser", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
+      .then(() => {
+        setIsLoggedIn(true);
+      })
+      .catch((error) => {
+        console.log("error=", error);
+      });
+  }
   useEffect(() => {
     getJobs();
+    checkLogin();
 
     if (receivedEmail) {
       setIsLoggedIn(true);
@@ -49,7 +71,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
         username={name}
         showProfile={true}
         pageName="Jobs"
-        onLogout={getJobs}
+        onLogout={logoutUser}
         showLogout={isLoggedIn}
         goToProfilePage={goToProfilePage}
       />

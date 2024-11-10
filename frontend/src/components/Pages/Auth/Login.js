@@ -10,6 +10,22 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+  async function checkLogin() {
+    const token = localStorage.getItem("token");
+    const response = await axios
+      .get("http://localhost:5000/api/verification/verifyUser", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
+      .then(() => {
+        navigate("/jobs");
+      })
+      .catch((error) => {
+        console.log("error=", error);
+      });
+  }
+  checkLogin();
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -21,14 +37,14 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
-      navigate("/Profile");
+      navigate("/jobs");
     } catch (error) {
       setMessage(error.response ? error.response.data : "Login failed");
     }
   };
 
   function handleHome() {
-    navigate('/');
+    navigate("/");
   }
 
   return (

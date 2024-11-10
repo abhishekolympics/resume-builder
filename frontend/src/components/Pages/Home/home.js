@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 import speakQuestion from "../../ai/speakQuestion";
 import stopRecording from "../../audio/stopRecording";
@@ -225,8 +226,26 @@ const Home = () => {
   };
 
   function handleOnLogin() {
-    navigate('/login');
+    navigate("/login");
   }
+  const userRef = useRef("");
+
+  async function checkLogin() {
+    const token = localStorage.getItem("token");
+    const response = await axios
+      .get("http://localhost:5000/api/verification/verifyUser", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
+      .then(() => {
+        navigate("/jobs");
+      })
+      .catch((error) => {
+        console.log("error=", error);
+      });
+  }
+  checkLogin();
 
   return (
     <div className="homePage">

@@ -13,6 +13,25 @@ const Register = ({ receivedEmail }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // To store error message
+  const [countdown, setCountdown] = useState(4);
+
+  async function checkLogin() {
+    const token = localStorage.getItem("token");
+    const response = await axios
+      .get("http://localhost:5000/api/verification/verifyUser", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
+      .then(() => {
+        navigate("/jobs");
+      })
+      .catch((error) => {
+        console.log("error=", error);
+      });
+  }
+  checkLogin();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -35,12 +54,30 @@ const Register = ({ receivedEmail }) => {
       setMessage(
         error.response ? error.response.data.message : "Registration failed"
       );
+      if (
+        error.response &&
+        error.response.data.message === "Email already in use."
+      ) {
+        setErrorMessage("Email already in use.");
+
+        let timer = countdown;
+        const intervalId = setInterval(() => {
+          timer -= 1;
+          setCountdown(timer);
+
+          // Once countdown reaches 0, navigate to the login page
+          if (timer === 0) {
+            clearInterval(intervalId);
+            navigate("/login"); // Redirect to the login page
+          }
+        }, 1000); // Decrease every second
+      }
     }
   };
   console.log("email inside register=", storedEmail);
 
   function handleJobs() {
-    navigate('/jobs');
+    navigate("/jobs");
   }
 
   return (
@@ -71,7 +108,16 @@ const Register = ({ receivedEmail }) => {
         />
         <button type="submit">Register</button>
       </form>
-      <p>{message}</p>
+      {errorMessage ? (
+        <div>
+          <p>{errorMessage}</p>
+          <p>
+            Redirecting to <strong>Login</strong> Page in {countdown} seconds...
+          </p>
+        </div>
+      ) : (
+        <p>{message}</p>
+      )}
     </div>
   );
 };
