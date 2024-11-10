@@ -9,7 +9,7 @@ dotStream.register();
 
 function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   const location = useLocation();
-  const receivedEmail = location.state?.storedEmail;
+  let receivedEmail = location.state?.storedEmail;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate();
@@ -36,9 +36,8 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   }
 
   function logoutUser() {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
-
   }
 
   async function checkLogin() {
@@ -65,14 +64,21 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
     }
   }, [searchTerm, isLoggedIn]);
 
+  function onLogin() {
+    receivedEmail = "onthewayabhishek@gmail.com";
+    navigate("/login", { state: { receivedEmail } });
+  }
+
   return (
-    <div className="outerDiv">
+    <div>
       <Navbar
         username={name}
         showProfile={true}
         pageName="Jobs"
         onLogout={logoutUser}
         showLogout={isLoggedIn}
+        showLogin={!isLoggedIn}
+        onLogin={onLogin}
         goToProfilePage={goToProfilePage}
       />
 

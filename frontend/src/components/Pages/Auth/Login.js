@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./Auth.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../../Utils/Navbar";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.receivedEmail || "");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -47,9 +48,19 @@ const Login = () => {
     navigate("/");
   }
 
+  function handleJobs() {
+    navigate("/jobs");
+  }
+
   return (
     <div className="auth-container">
-      <Navbar pageName={"Login"} handleHome={handleHome} showHome={true} />
+      <Navbar
+        pageName={"Login"}
+        handleHome={handleHome}
+        showHome={true}
+        showJobsOnLogin={true}
+        handleJobs={handleJobs}
+      />
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input

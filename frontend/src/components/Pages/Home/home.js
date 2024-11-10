@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 import speakQuestion from "../../ai/speakQuestion";
 import stopRecording from "../../audio/stopRecording";
@@ -24,10 +24,9 @@ const Home = () => {
   const audioChunksRef = useRef([]);
   const maxRecordingTimeoutRef = useRef(null);
   const recordingTimerRef = useRef(null);
-  const processingResultsRef = useRef([]);
-  const [showUserName, setShowUserName] = useState(false);
+  const processingResultsRef = useRef(processingResults);
+  console.log(recordingTime);
 
-  const MAX_RECORDING_TIME = 10000; // 2 seconds maximum recording time
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
   const questions = [
@@ -63,7 +62,7 @@ const Home = () => {
   // Stop recording and process audio
   useEffect(() => {
     currentQuestionRef.current = currentQuestion;
-  }, [currentQuestionRef]);
+  }, [currentQuestionRef,currentQuestion]);
 
   const startConversation = async () => {
     setIsActive(true);
@@ -94,11 +93,6 @@ const Home = () => {
     );
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   const generateResumePDF = (data) => {
     // console.log("Generate Resume is called.");
@@ -228,11 +222,10 @@ const Home = () => {
   function handleOnLogin() {
     navigate("/login");
   }
-  const userRef = useRef("");
 
   async function checkLogin() {
     const token = localStorage.getItem("token");
-    const response = await axios
+    await axios
       .get("http://localhost:5000/api/verification/verifyUser", {
         headers: {
           Authorization: `Bearer ${token}`, // Send token in Authorization header
@@ -248,29 +241,34 @@ const Home = () => {
   checkLogin();
 
   return (
-    <div className="homePage">
-      <Navbar pageName={"Home"} showLogin={true} onLogin={handleOnLogin} />
-      <h1>AI Resume Generator</h1>
-
-      <div>
-        <button onClick={startConversation} disabled={isActive}>
-          Start Conversation
-        </button>
-      </div>
-
-      {isActive && (
+    <div>
+      <Navbar pageName={"Home"} />
+      <div className="homePage">
+        <h1>AI Resume Generator</h1>
         <div>
-          {isBotSpeaking ? (
-            <img src={BotSpeaking} height={100} width={100}></img>
-          ) : !isBotSpeaking ? (
-            <div>
-              <img src={RecordingGif} height={100} width={100}></img>
-            </div>
-          ) : (
-            <p>Processing...</p>
-          )}
+          <button onClick={startConversation} disabled={isActive}>
+            Start Conversation
+          </button>
         </div>
-      )}
+
+        {isActive && (
+          <div>
+            {isBotSpeaking && isRecording? (
+              <img src={BotSpeaking} alt='Bot is speaking' height={100} width={100}></img>
+            ) : !isBotSpeaking ? (
+              <div>
+                <img src={RecordingGif} alt='recording is on' height={100} width={100}></img>
+              </div>
+            ) : (
+              <p>Processing...</p>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="homePage">
+        <h3>Been here before?</h3>
+        <button onClick={handleOnLogin}>LOGIN</button>
+      </div>
     </div>
   );
 };

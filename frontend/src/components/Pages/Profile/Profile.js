@@ -21,6 +21,7 @@ function Profile() {
   });
 
   const showLogout = useRef(false);
+  const showLogin = useRef(true);
 
   // Only useRef for values that are persistent but don't need to trigger re-renders
   const initialEmail = useRef("oonthewayabhishek@gmail.com");
@@ -34,7 +35,7 @@ function Profile() {
   };
   async function checkLogin() {
     const token = localStorage.getItem("token");
-    const response = await axios
+    await axios
       .get("http://localhost:5000/api/verification/verifyUser", {
         headers: {
           Authorization: `Bearer ${token}`, // Send token in Authorization header
@@ -42,13 +43,14 @@ function Profile() {
       })
       .then(() => {
         showLogout.current = true;
+        showLogin.current = false;
       })
       .catch((error) => {
-        console.log("error=", error);
+        console.log("error=", error.message);
+        showLogin.current = true;
       });
   }
-  checkLogin();
-
+  
   useEffect(() => {
     async function getData() {
       try {
@@ -80,7 +82,8 @@ function Profile() {
         console.error("Error fetching profile data", error);
       }
     }
-
+    
+    checkLogin();
     getData();
   }, []); // Empty array ensures it only runs once
 
@@ -89,13 +92,25 @@ function Profile() {
   }
 
   function onLogout() {
-    localStorage.removeItem('token');
-    showLogout.current=false;
+    localStorage.removeItem("token");
+    showLogout.current = false;
+    showLogin.current = true;
+  }
+  function onLogin() {
+    navigate("/login");
   }
 
   return (
     <div className="main-profile-container">
-      <Navbar pageName={"Profile"} showJobs={true} handleJobs={handleJobs} showLogout={showLogout.current} onLogout={onLogout} />
+      <Navbar
+        pageName={"Profile"}
+        showJobs={true}
+        handleJobs={handleJobs}
+        showLogout={showLogout.current}
+        onLogout={onLogout}
+        showLogin={showLogin.current}
+        onLogin={onLogin}
+      />
       <div className="profile-container">
         <h2>Profile Page</h2>
         <form className="profile-form">
