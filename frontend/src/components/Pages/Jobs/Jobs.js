@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../../Utils/Navbar";
@@ -11,10 +11,13 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   const location = useLocation();
   let receivedEmail = location.state?.storedEmail;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
   const searchTerm = "web developer";
-  const [jobs, setJobs] = useState([]);
+
+  // Ref to track if getJobs has been called
+  const hasCalledGetJobs = useRef(false);
+
   const onClickHandler = () => {
     navigate("/register", { state: { receivedEmail } });
   };
@@ -24,13 +27,18 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   };
 
   async function getJobs() {
-    const response = await axios.get(
-      "https://resume-builder-production-1d7b.up.railway.app/api/find/jobs",
-      {
-        params: { searchTerm },
-      }
-    );
-    setJobs(response.data);
+    console.log("getJobs is called");
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URI}/api/find/jobs`,
+        {
+          params: { searchTerm },
+        }
+      );
+      setJobs(response.data.slice(0,3));
+    } catch (error) {
+      console.log("Error fetching jobs:", error);
+    }
   }
 
   function goToProfilePage() {
@@ -44,38 +52,47 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   }
 
   useEffect(() => {
-    console.log("useEffect is sending these requests.");
+    // Ensure that getJobs is called only once using the ref
+    if (!hasCalledGetJobs.current) {
+      getJobs();
+      hasCalledGetJobs.current = true;
+    }
+  }, []); // Empty dependency array ensures this runs only once
+
+  useEffect(() => {
+    // Only check login status if it's not already logged in
     async function checkLogin() {
       const token = localStorage.getItem("token");
       if (!token) {
         console.log("No token available, skipping verification.");
         navigate("/");
+        return;
       }
 
-      await axios
-        .get(
-          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+      try {
+        await axios.get(
+          `${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Send token in Authorization header
             },
           }
-        )
-        .then(() => {
-          setIsLoggedIn(true);
-        })
-        .catch((error) => {
-          navigate("/");
-          console.log("error=", error);
-        });
+        );
+        setIsLoggedIn(true);
+      } catch (error) {
+        navigate("/");
+        console.log("Error verifying user:", error);
+      }
     }
-    getJobs();
-    checkLogin();
+
+    if (!isLoggedIn) {
+      checkLogin();
+    }
 
     if (receivedEmail) {
       setIsLoggedIn(true);
     }
-  }, [searchTerm, isLoggedIn,navigate,receivedEmail]);
+  }, [isLoggedIn, navigate, receivedEmail]); // This effect only runs when login state changes
 
   function onLogin() {
     receivedEmail = "onthewayabhishek@gmail.com";
