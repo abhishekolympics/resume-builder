@@ -162,7 +162,7 @@ async function scrapeJobs(searchTerm) {
   try {
     console.log("Launching browser...");
     browser = await puppeteer.launch({
-      headless: false, // Switch to headful mode for realistic user session
+      headless: true, // Switch to headful mode for realistic user session
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
