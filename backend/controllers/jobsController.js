@@ -60,9 +60,9 @@ async function scrapeJobs(searchTerm) {
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
+        // "--disable-dev-shm-usage",
         "--remote-debugging-port=9222",
-        "--single-process",
+        // "--single-process",
         "--disable-gpu",
         "--disable-software-rasterizer",
       ],
