@@ -23,14 +23,11 @@ const Register = ({ receivedEmail }) => {
       return; // Skip the verification if there's no token
     }
     await axios
-      .get(
-        "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Send token in Authorization header
-          },
-        }
-      )
+      .get(`${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      })
       .then(() => {
         navigate("/jobs");
       })
@@ -52,7 +49,7 @@ const Register = ({ receivedEmail }) => {
 
     try {
       const response = await axios.post(
-        "https://resume-builder-production-1d7b.up.railway.app/api/auth/register",
+        `${process.env.REACT_APP_BACKEND_URI}/api/auth/register`,
         { email, password }
       );
       localStorage.setItem("token", response.data.token);

@@ -19,15 +19,12 @@ const Login = () => {
         return; // Skip the verification if there's no token
       }
       await axios
-        .get(
-          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Send token in Authorization header
-            },
-            withCredentials: true,
-          }
-        )
+        .get(`${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Send token in Authorization header
+          },
+          withCredentials: true,
+        })
         .then(() => {
           navigate("/jobs");
         })
@@ -41,7 +38,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://resume-builder-production-1d7b.up.railway.app/api/auth/login",
+        `${process.env.REACT_APP_BACKEND_URI}/api/auth/login`,
         {
           email,
           password,
