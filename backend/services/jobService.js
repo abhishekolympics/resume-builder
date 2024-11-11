@@ -1,5 +1,5 @@
 // src/services/jobService.js
-const Job = require('../models/job');
+const Job = require('../models/Job');
 const scrapeJobs = require('./jobScraperService'); // if you have a separate scraping service
 
 // Fetch jobs from the database
