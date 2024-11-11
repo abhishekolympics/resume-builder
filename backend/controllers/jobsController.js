@@ -165,17 +165,18 @@ async function scrapeWithCaptchaSolving(page, searchTerm) {
       await solveCaptcha(page, siteUrl, siteKey, apiKey);
     }
 
+    await page.waitForSelector("a.JobCard_jobTitle___7I6y", { timeout: 5000 });
+
     const jobData = await page.evaluate(() => {
-      const jobs = [];
-      const jobElements = document.querySelectorAll(
-        ".heading_Heading__BqX5J.heading_Level1__soLZs"
+      // Get all job titles and their respective links using the class and href
+      const jobElements = Array.from(
+        document.querySelectorAll("a.JobCard_jobTitle___7I6y")
       );
-      jobElements.forEach((element) => {
-        const jobTitle = element.innerText.trim();
-        const jobUrl = element.closest("a") ? element.closest("a").href : "";
-        jobs.push({ title: jobTitle, link: jobUrl });
-      });
-      return jobs.slice(0, 3);
+
+      return jobElements.map((job) => ({
+        title: job.innerText, // Job title
+        link: job.href, // Job link
+      }));
     });
 
     console.log("jobdata in captcha-solving session:", jobData);
