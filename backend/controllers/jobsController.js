@@ -94,65 +94,7 @@ async function scrapeJobs(searchTerm) {
 
     const newJobData = await scrapeGlassdoor(page, searchTerm);
     console.log("glassdoor function returned this=", newJobData);
-
-    console.log("Navigating to Indeed...");
-    await page.goto(
-      `https://in.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}`,
-      {
-        waitUntil: "domcontentloaded",
-      }
-    );
-    console.log(
-      `Navigation to https://in.indeed.com/jobs?q=${encodeURIComponent(
-        searchTerm
-      )} completed.`
-    );
-
-    // Confirm page load by printing title and a known element's content
-    const pageTitle = await page.title();
-    console.log(`Page title loaded: ${pageTitle}`);
-
-    const logoText = await page.evaluate(() => {
-      const logoElement = document.querySelector("div.icl-WhatWhere-logo");
-      return logoElement ? logoElement.innerText : "Logo text not found";
-    });
-    console.log(`Indeed logo text found: ${logoText}`);
-
-    // Wait for job elements to load
-    console.log("Waiting for job title selector...");
-    try {
-      await page.waitForSelector("h2.jobTitle a", { timeout: 60000 });
-      console.log("Job title selector found.");
-    } catch (error) {
-      console.error("Job title selector not found:", error);
-      return [];
-    }
-
-    // Scrape job post titles and URLs
-    console.log("Scraping job titles and URLs...");
-    console.log("glassdoor function returned this=", newJobData);
-    const jobData = await page.evaluate(() => {
-      const jobs = [];
-      const jobElements = document.querySelectorAll("h2.jobTitle a");
-
-      if (jobElements.length === 0) {
-        console.log("No job elements found.");
-      }
-
-      jobElements.forEach((element) => {
-        const relativeUrl = element.getAttribute("href"); // Get the relative URL
-        const absoluteUrl = `https://in.indeed.com${relativeUrl}`; // Construct the absolute URL
-        const jobTitle = element.innerText.trim(); // Get the job title
-
-        jobs.push({ title: jobTitle, link: absoluteUrl });
-      });
-
-      console.log(`Scraped ${jobs.length} job listings.`);
-      return jobs.slice(0, 3); // Return the first three job listings with title and link
-    });
-
-    console.log("Job scraping completed.");
-
+    
     await browser.close();
     console.log("Browser closed.");
 
