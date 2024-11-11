@@ -22,10 +22,15 @@ async function scrapeAndSaveJobs(userId, searchTerm) {
   try {
     const scrapedJobs = await scrapeJobs(searchTerm); // scrape jobs if not found in DB
 
+    const formattedJobs = scrapedJobs.map(job => ({
+      jobName: job.title,
+      jobLink: job.link
+  }));
+
     if (scrapedJobs.length > 0) {
       const newJob = new Job({
         userid: userId,
-        jobs: scrapedJobs
+        jobs: formattedJobs
       });
       await newJob.save();
       return scrapedJobs;
