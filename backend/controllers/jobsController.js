@@ -6,7 +6,7 @@ async function solveCaptcha(page, siteUrl, siteKey, apiKey) {
 
   // Step 1: Request captcha solving
   const captchaIdResponse = await axios.get(
-    `http://2captcha.com/in.php?key=${process.response.CAPTCHA_API_KEY}&method=userrecaptcha&googlekey=${siteKey}&pageurl=${siteUrl}&json=1`
+    `http://2captcha.com/in.php?key=${apiKey}&method=userrecaptcha&googlekey=${siteKey}&pageurl=${siteUrl}&json=1`
   );
   const captchaId = captchaIdResponse.data.request;
 
