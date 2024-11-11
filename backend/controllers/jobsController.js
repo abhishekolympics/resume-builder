@@ -46,7 +46,7 @@ async function solveCaptcha(page, siteUrl, siteKey, apiKey) {
   console.log("Captcha solution submitted.");
 
   // Wait for navigation after captcha
-  await page.waitForNavigation({ waitUntil: "networkidle2" });
+  await page.waitForNavigation({ waitUntil: "domcontentloaded" });
 }
 
 async function scrapeJobs(searchTerm) {
@@ -108,7 +108,7 @@ async function scrapeWithRealisticSession(page, searchTerm) {
       `https://www.glassdoor.co.in/Job/united-states-${encodeURIComponent(
         searchTerm
       )}-jobs-SRCH_IL.0,13_KO14,27.htm`,
-      { waitUntil: "networkidle2" }
+      { waitUntil: "domcontentloaded" }
     );
 
     const pageTitle = await page.title();
@@ -118,6 +118,8 @@ async function scrapeWithRealisticSession(page, searchTerm) {
       console.log("Blocked by security page in realistic session.");
       return [];
     }
+
+    await page.waitForSelector("a.JobCard_jobTitle___7I6y", { timeout: 5000 });
 
     const jobData = await page.evaluate(() => {
       // Get all job titles and their respective links using the class and href
@@ -147,7 +149,7 @@ async function scrapeWithCaptchaSolving(page, searchTerm) {
     const siteUrl = `https://www.glassdoor.co.in/Job/united-states-${encodeURIComponent(
       searchTerm
     )}-jobs-SRCH_IL.0,13_KO14,27.htm`;
-    await page.goto(siteUrl, { waitUntil: "networkidle2" });
+    await page.goto(siteUrl, { waitUntil: "domcontentloaded" });
 
     const pageTitle = await page.title();
     if (pageTitle.includes("Security")) {
