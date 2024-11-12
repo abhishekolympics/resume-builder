@@ -13,7 +13,6 @@ const stopRecording = async (
   maxRecordingTimeoutRef,
   stopRecording,
   cleanup,
-  setIsRecording,
   questions,
   processingResultsRef,
   setProcessingResults,
@@ -28,7 +27,6 @@ const stopRecording = async (
 ) => {
   if (mediaRecorderRef.current) {
     cleanup(maxRecordingTimeoutRef, recordingTimerRef);
-    setIsRecording(false);
 
     mediaRecorderRef.current.stop();
 
@@ -76,7 +74,6 @@ const stopRecording = async (
               maxRecordingTimeoutRef,
               stopRecording,
               cleanup,
-              setIsRecording,
               questions,
               processingResultsRef,
               setProcessingResults,

@@ -16,7 +16,6 @@ import { questions, maxRecordingTimes } from "../../constants/formQuestions";
 const Home = () => {
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [recordingTime, setRecordingTime] = useState(0);
   const [processingResults, setProcessingResults] = useState([]);
@@ -26,11 +25,6 @@ const Home = () => {
   const maxRecordingTimeoutRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const processingResultsRef = useRef(processingResults);
-  let a;
-  useEffect(() => {
-    a = isRecording;
-  }, []);
-  const hasCalledCheckLogin = useRef(false);
 
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
@@ -63,7 +57,6 @@ const Home = () => {
       maxRecordingTimeoutRef,
       stopRecording,
       cleanup,
-      setIsRecording,
       questions,
       processingResultsRef,
       setProcessingResults,
