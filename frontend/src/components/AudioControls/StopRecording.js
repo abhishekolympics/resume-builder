@@ -95,7 +95,6 @@ const stopRecording = async (
             );
           }, 1000);
         } else {
-          setIsActive(false);
           await handleCompleteConversation(processingResultsRef);
         }
       } else {
