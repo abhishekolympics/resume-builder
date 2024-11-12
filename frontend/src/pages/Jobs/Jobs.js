@@ -7,7 +7,7 @@ import { dotStream } from "ldrs";
 
 dotStream.register();
 
-function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
+function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle }) {
   const location = useLocation();
   let receivedEmail = location.state?.storedEmail;
   let id = location.state?.id || null;
@@ -15,7 +15,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
-  const searchTerm = "web developer";
+  const searchTerm = location.state?.jobTitle || "web developer";
 
   // Ref to track if getJobs has been called
   const hasCalledGetJobs = useRef(false);
@@ -127,10 +127,10 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com" }) {
             {jobs.map((job, index) => (
               <li key={index}>
                 <h2
-                  onClick={() => jobClickHandler(job.jobLink)}
+                  onClick={() => jobClickHandler(job.link)}
                   style={{ cursor: "pointer", color: "blue" }}
                 >
-                  {job.jobName}
+                  {job.title}
                 </h2>
               </li>
             ))}
