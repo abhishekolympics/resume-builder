@@ -25,7 +25,7 @@ const resumeSchema = new mongoose.Schema(
       },
     ],
     certifications: { type: String },
-    yearOfExperience: { type: String },
+    yearsOfExperience: { type: String },
     proficiency: { type: String },
     projects: [
       {
