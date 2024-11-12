@@ -188,7 +188,7 @@ function Profile() {
           />
           <label>Years of Experience:</label>
           <input
-            type="number"
+            type="text"
             name="yearsOfExperience"
             value={profileData.yearsOfExperience}
             onChange={handleChange}
