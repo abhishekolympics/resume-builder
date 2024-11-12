@@ -1,6 +1,6 @@
 // src/services/jobService.js
-const Job = require('../models/Job');
-const scrapeJobs = require('./jobScraperService'); // if you have a separate scraping service
+const Job = require("../models/Job");
+const scrapeJobs = require("./jobScraperService"); // if you have a separate scraping service
 
 // Fetch jobs from the database
 async function getJobs(userId) {
@@ -13,7 +13,7 @@ async function getJobs(userId) {
       return null;
     }
   } catch (error) {
-    throw new Error('Error fetching jobs from database: ' + error.message);
+    throw new Error("Error fetching jobs from database: " + error.message);
   }
 }
 
@@ -22,27 +22,29 @@ async function scrapeAndSaveJobs(userId, searchTerm) {
   try {
     const scrapedJobs = await scrapeJobs(searchTerm); // scrape jobs if not found in DB
 
-    const formattedJobs = scrapedJobs.map(job => ({
+    const formattedJobs = scrapedJobs.map((job) => ({
       jobName: job.title,
-      jobLink: job.link
-  }));
+      jobLink: job.link,
+    }));
 
     if (scrapedJobs.length > 0) {
-      const newJob = new Job({
-        userid: userId,
-        jobs: formattedJobs
-      });
-      await newJob.save();
+      if (userId !== null) {
+        const newJob = new Job({
+          userid: userId,
+          jobs: formattedJobs,
+        });
+        await newJob.save();
+      }
       return scrapedJobs;
     } else {
-      throw new Error('No jobs found during scraping.');
+      throw new Error("No jobs found during scraping.");
     }
   } catch (error) {
-    throw new Error('Error scraping and saving jobs: ' + error.message);
+    throw new Error("Error scraping and saving jobs: " + error.message);
   }
 }
 
 module.exports = {
   getJobs,
-  scrapeAndSaveJobs
+  scrapeAndSaveJobs,
 };
