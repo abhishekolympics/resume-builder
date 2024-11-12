@@ -427,40 +427,44 @@ const Home = () => {
     }
   });
 
-  // Timer logic
+  // Effect for reverse countdown timer
   useEffect(() => {
     let timerInterval = null;
 
-    if (isRecording && recordingStartedRef.current) {
+    // Start the timer only if recording has started and is not yet stopped
+    if (
+      isRecording &&
+      recordingStartedRef.current &&
+      currentMaxTimeRef.current > 0
+    ) {
+      // Initialize recordingTime to the maximum countdown time
       setRecordingTime(currentMaxTimeRef.current);
-      recordingStartedRef.current = false; // Reset start ref after countdown begins
 
+      // Set up interval to decrease time every second
       timerInterval = setInterval(() => {
         setRecordingTime((prevTime) => {
-          if (prevTime > 0) {
+          if (prevTime > 1) {
             return prevTime - 1;
           } else {
-            clearInterval(timerInterval);
+            clearInterval(timerInterval); // Stop timer when it reaches 0
             recordingStoppedRef.current = true; // Signal recording stopped
             return 0;
           }
         });
       }, 1000);
+
+      recordingStartedRef.current = false; // Reset start flag after initiating timer
     }
 
+    // Clean up the interval when recording stops or component unmounts
     return () => clearInterval(timerInterval);
-  }, [
-    isRecording,
-    currentMaxTimeRef,
-    recordingStartedRef,
-    recordingStoppedRef,
-  ]);
+  }, [isRecording]);
 
-  // To reset timer when recording stops
+  // Effect to reset timer when recording stops
   useEffect(() => {
     if (recordingStoppedRef.current) {
       setRecordingTime(0); // Reset display
-      recordingStoppedRef.current = false;
+      recordingStoppedRef.current = false; // Reset the stopped flag
     }
   }, [recordingStoppedRef]);
 

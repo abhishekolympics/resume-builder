@@ -12,7 +12,10 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "https://audio-resume-generator.up.railway.app",
+    origin: [
+      "https://audio-resume-generator.up.railway.app",
+      "http://localhost:3000/",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
