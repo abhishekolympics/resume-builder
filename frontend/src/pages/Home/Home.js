@@ -63,10 +63,6 @@ const Home = () => {
   const recordingStartedRef = useRef(false);
   const recordingStoppedRef = useRef(true);
 
-  function timer() {
-    currentMaxTimeRef -= 1;
-  }
-
   const currentQuestionRef = useRef(currentQuestion);
 
   // Stop recording and process audio
