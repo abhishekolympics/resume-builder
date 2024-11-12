@@ -33,6 +33,7 @@ const Home = () => {
   const recordingStoppedRef = useRef(true);
 
   const currentQuestionRef = useRef(currentQuestion);
+  const hasCalledCheckLogin = useRef(false);
 
   // Stop recording and process audio
   useEffect(() => {
