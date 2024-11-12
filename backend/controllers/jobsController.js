@@ -1,7 +1,7 @@
 const jobService = require('../services/jobService');
 
 async function getJobs(req, res) {
-  const userId = req.query.id || ''; // Assuming you have user information in the request
+  const userId = req.query.id || null; // Assuming you have user information in the request
   const searchTerm = req.query.searchTerm || ''; // If a search term is passed
 
   try {
