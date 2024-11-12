@@ -130,14 +130,20 @@ const Home = () => {
     checkPageOverflow();
 
     // Skills
-    doc.text("Skills:", 20, y);
-    y += 7;
-    data.skills.forEach((skill) => {
-      doc.text(`- ${skill}`, 25, y);
+    if (Array.isArray(data.skills)) {
+      doc.text("Skills:", 20, y);
+      y += 7;
+      data.skills.forEach((skill) => {
+        doc.text(`- ${skill}`, 25, y);
+        y += 7;
+        checkPageOverflow();
+      });
+      y += 5;
+    } else if (data.skills) {
+      doc.text(`Skills: ${data.skills || ""}`, 20, y);
       y += 7;
       checkPageOverflow();
-    });
-    y += 5;
+    }
 
     // Recent Job and Responsibilities
     if (data.recentJob) {
@@ -190,7 +196,7 @@ const Home = () => {
         y += 7;
         checkPageOverflow();
         const expResponsibilities = doc.splitTextToSize(
-          `  Responsibilities: ${exp.responsibilities.join(", ")}`,
+          `  Responsibilities: ${exp.responsibilities}`,
           180
         );
         doc.text(expResponsibilities, 25, y);
@@ -217,7 +223,7 @@ const Home = () => {
       y += 7;
       checkPageOverflow();
       const expResponsibilities = doc.splitTextToSize(
-        `  Responsibilities: ${data.experience.responsibilities.join(", ")}`,
+        `  Responsibilities: ${data.experience.responsibilities}`,
         180
       );
       doc.text(expResponsibilities, 25, y);
@@ -253,15 +259,21 @@ const Home = () => {
     y += 5;
 
     // Certifications
-    doc.text("Certifications:", 20, y);
-    y += 7;
-    checkPageOverflow();
-    data.certifications.forEach((cert) => {
-      doc.text(`- ${cert}`, 25, y);
+    if (Array.isArray(data.certifications)) {
+      doc.text("Certifications:", 20, y);
       y += 7;
       checkPageOverflow();
-    });
-    y += 5;
+      data.certifications.forEach((cert) => {
+        doc.text(`- ${cert}`, 25, y);
+        y += 7;
+        checkPageOverflow();
+      });
+      y += 5;
+    } else if (data.certifications) {
+      doc.text(`  Certifications: ${data.certifications}`, 25, y);
+      y += 7;
+      checkPageOverflow();
+    }
 
     // Years of Experience
     doc.text(`Years of Experience: ${data.yearsOfExperience}`, 20, y);
@@ -269,15 +281,9 @@ const Home = () => {
     checkPageOverflow();
 
     // Proficiency
-    doc.text("Software Proficiency:", 20, y);
+    doc.text(`Software Proficiency:", ${data.proficiency}`, 20, y);
     y += 7;
     checkPageOverflow();
-    data.proficiency.forEach((prof) => {
-      doc.text(`- ${prof}`, 25, y);
-      y += 7;
-      checkPageOverflow();
-    });
-    y += 10;
 
     // Contact Information
     doc.text("Contact Information:", 20, y);
@@ -286,7 +292,7 @@ const Home = () => {
     doc.text(`Phone Number: ${data.contactInfo.phoneNumber || "N/A"}`, 25, y);
     y += 7;
     checkPageOverflow();
-    doc.text(`Address: ${data.contactInfo.address || "N/A"}`, 25, y);
+    doc.text(`Email Address: ${data.contactInfo.emailAddress || "N/A"}`, 25, y);
 
     // Convert to Base64 and send
     const pdfName = `${data.fullName.replace(/ /g, "_")}_Resume.pdf`;
@@ -355,15 +361,10 @@ const Home = () => {
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
             messages: [
-              // {
-              //   role: "system",
-              //   content:
-              //     "Format and organize the following user's resume data into JSON fields with the following names: fullName, email, jobTitle, careerObjective, skills, recentJob, responsibilities, education, certifications, yearsOfExperience, proficiency, and contact. Ensure each field is accurately populated and, if any information is missing, leave it as an empty string.",
-              // },
               {
                 role: "system",
                 content:
-                  "Format and organize the following user's resume data into JSON fields with the following names: fullName, email, jobTitle, careerObjective, skills, recentJob, responsibilities, experience, education, certifications, yearsOfExperience, proficiency, projects, and contactInfo. If any information is missing, populate the field as an empty string or an empty array (for list fields). For experience, include 'company', 'position', 'startDate', 'endDate', and 'responsibilities'. For education, include 'degree' and 'institution'. For projects, include 'projectName', 'description', and 'technologiesUsed'. For contactInfo, include 'phoneNumber' and 'address'. Do not add extra fields. These fields shouldn't be an array -> recentJob, responsibilities, certifications, yearsOfExperience, proficiency. In responsibilites add the responsibilities which were given at the job. ",
+                  "You are a resume processing assistant. Format and organize the following user's resume data into JSON with the following fields: fullName, email, jobTitle, careerObjective, skills, recentJob, responsibilities, experience, education, certifications, yearsOfExperience, proficiency, projects, and contactInfo. If any information is missing, populate the field as an empty string (for text fields) or an empty array (for list fields). Ensure that these fields are not arrays: recentJob, responsibilities, certifications, yearsOfExperience, and proficiency. Populate the responsibilities field with the job duties that were provided. For the 'experience' field, include the subfields: 'company', 'position', 'startDate', 'endDate', and 'responsibilities'. Experience is an array because a person can work for more than 1 company with different positions and different start and end dates. For the 'education' field, include the subfields: 'degree' and 'institution'. Education is an array, because a person can have more than one degree. For the 'projects' field, include the subfields: 'projectName', 'description', and 'technologiesUsed'. For 'contactInfo', include 'phoneNumber' and 'EmailAddress'. **Ensure that 'recentJob' is a single string with job title and company name, 'proficiency' is a single string with software tools, careerObjective is a single string, certifications is a single string, email is a single string, fullName is a single string, jobTitle is a single string, responsibilities is a single string, yearsOfExperience is a single string.** **Also ensure skills is an string array, technologiesUsed is a string array.** **Experience is an array, education is an array, projects is an array.** Do not include any additional fields. Format the data exactly as described, with no extra information or fields.",
               },
               {
                 role: "user",
