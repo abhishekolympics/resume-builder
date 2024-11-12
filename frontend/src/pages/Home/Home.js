@@ -162,19 +162,7 @@ const Home = () => {
     }
   });
 
-  // Timer related state and refs
-  const [currentTime, setCurrentTime] = useState(maxRecordingTimes[0] / 1000); // In seconds
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  useEffect(() => {
-    setCurrentTime(maxRecordingTimes[currentQuestionIndex] / 1000); // Reset timer for next question
-  }, [currentQuestionIndex]);
-
-  const handleTimerComplete = () => {
-    if (currentQuestionIndex < maxRecordingTimes.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
   return (
     <div>
       <Navbar pageName={"Home"} />
