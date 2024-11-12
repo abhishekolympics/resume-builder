@@ -7,7 +7,12 @@ import { dotStream } from "ldrs";
 
 dotStream.register();
 
-function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle, userId }) {
+function Jobs({
+  name,
+  storedEmail = "onthewayabhishek@gmail.com",
+  jobTitle,
+  userId,
+}) {
   const location = useLocation();
   let receivedEmail = location.state?.storedEmail;
   let id = location.state?.userId || null;
@@ -104,6 +109,7 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle, user
     navigate("/login", { state: { receivedEmail } });
   }
 
+  console.log('jobs =',jobs);
   return (
     <div>
       <Navbar
@@ -127,10 +133,12 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle, user
             {jobs.map((job, index) => (
               <li key={index}>
                 <h2
-                  onClick={() => jobClickHandler(job.jobLink)}
+                  onClick={() =>
+                    jobClickHandler(job.jobLink ? job.jobLink : job.link)
+                  }
                   style={{ cursor: "pointer", color: "blue" }}
                 >
-                  {job.jobName}
+                  {job.jobName ? job.jobName : job.title}
                 </h2>
               </li>
             ))}
