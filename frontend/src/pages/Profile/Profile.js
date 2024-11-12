@@ -77,13 +77,20 @@ function Profile() {
             email: profile.email || "",
             careerObjective: profile.careerObjective || "",
             skills: profile.skills?.join(", ") || "", // Use optional chaining
-            recentJob: profile.recentJob || "",
-            responsibilities: profile.responsibilities || "",
-            education: profile.education?.join(", ") || "", // Use optional chaining
+            recentJob:
+              "At " +
+                profile.experience[0].company +
+                " as a " +
+                profile.experience[0].position || "",
+            responsibilities: profile.experience[0].responsibilities || "",
+            education:
+              profile.education[0]?.degree +
+                " From " +
+                profile.education[0]?.institution || "", // Use optional chaining
             certifications: profile.certifications || "",
             yearsOfExperience: profile.yearsOfExperience || 0,
-            proficiency: profile.proficiency?.join(", ") || "", // Use optional chaining
-            contact: profile.contact || "",
+            proficiency: profile.proficiency || "", // Use optional chaining
+            contact: profile.contactInfo.phoneNumber || "",
           });
         }
       } catch (error) {
