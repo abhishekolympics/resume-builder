@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Auth.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../Utils/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 
 const Register = ({ receivedEmail }) => {
   const location = useLocation();
@@ -27,6 +27,7 @@ const Register = ({ receivedEmail }) => {
         headers: {
           Authorization: `Bearer ${token}`, // Send token in Authorization header
         },
+        withCredentials: true,
       })
       .then(() => {
         navigate("/jobs");

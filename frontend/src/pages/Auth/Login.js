@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Auth.css";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "../../Utils/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 
 const Login = () => {
   const location = useLocation();
@@ -45,7 +45,7 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
-      navigate("/jobs");
+      navigate("/jobs",);
     } catch (error) {
       setMessage(error.response ? error.response.data : "Login failed");
     }

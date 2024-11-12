@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Profile.css";
-import Navbar from "../../Utils/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
 
 function Profile() {
@@ -24,7 +24,7 @@ function Profile() {
   const showLogin = useRef(true);
 
   // Only useRef for values that are persistent but don't need to trigger re-renders
-  const initialEmail = useRef("oonthewayabhishek@gmail.com");
+  const initialEmail = useRef("onthewayabhishek@gmail.com");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,7 +43,7 @@ function Profile() {
       }
       await axios
         .get(
-          "https://resume-builder-production-1d7b.up.railway.app/api/verification/verifyUser",
+          `${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Send token in Authorization header
@@ -63,7 +63,7 @@ function Profile() {
     async function getData() {
       try {
         const response = await axios.get(
-          "https://resume-builder-production-1d7b.up.railway.appapi/resume/profile",
+          `${process.env.REACT_APP_BACKEND_URI}/api/resume/profile`,
           {
             params: { email: initialEmail.current }, // Use the email from useRef
           }
@@ -76,13 +76,13 @@ function Profile() {
             fullName: profile.fullName || "",
             email: profile.email || "",
             careerObjective: profile.careerObjective || "",
-            skills: profile.skills.join(", ") || "",
+            skills: profile.skills?.join(", ") || "", // Use optional chaining
             recentJob: profile.recentJob || "",
             responsibilities: profile.responsibilities || "",
-            education: profile.education.join(", ") || "",
+            education: profile.education?.join(", ") || "", // Use optional chaining
             certifications: profile.certifications || "",
             yearsOfExperience: profile.yearsOfExperience || 0,
-            proficiency: profile.proficiency.join(", ") || "",
+            proficiency: profile.proficiency?.join(", ") || "", // Use optional chaining
             contact: profile.contact || "",
           });
         }
@@ -102,11 +102,14 @@ function Profile() {
   function onLogout() {
     localStorage.removeItem("token");
     showLogout.current = false;
+    console.log("showlogout in onlogout=", showLogout.current);
     showLogin.current = true;
+    console.log("showlogin in onlogout=", showLogin.current);
   }
   function onLogin() {
     navigate("/login");
   }
+  console.log("showlogout in profile=", showLogout.current);
 
   return (
     <div className="main-profile-container">

@@ -1,4 +1,4 @@
-import processAudio from "../ai/processAudio";
+import processAudio from "../AI/processAudio";
 
 const stopRecording = async (
   text,

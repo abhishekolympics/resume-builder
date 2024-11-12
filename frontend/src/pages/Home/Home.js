@@ -3,14 +3,14 @@ import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import speakQuestion from "../../ai/speakQuestion";
-import stopRecording from "../../audio/stopRecording";
-import startRecording from "../../audio/startRecording";
-import cleanup from "../../Utils/cleanup";
-import RecordingGif from "../../../assets/rec.gif";
-import BotSpeaking from "../../../assets/bot.gif";
-import Navbar from "../../Utils/Navbar";
-import "./home.css";
+import speakQuestion from "../../components/AI/speakQuestion";
+import stopRecording from "../../components/AudioControls/StopRecording";
+import startRecording from "../../components/AudioControls/StartRecording";
+import cleanup from "../../components/utils/cleanup";
+import RecordingGif from "../../assets/rec.gif";
+import BotSpeaking from "../../assets/bot.gif";
+import Navbar from "../../components/Navbar/Navbar";
+import "./Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -26,6 +26,8 @@ const Home = () => {
   const recordingTimerRef = useRef(null);
   const processingResultsRef = useRef(processingResults);
   console.log(recordingTime);
+
+  const hasCalledCheckLogin = useRef(false);
 
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
@@ -49,11 +51,11 @@ const Home = () => {
     10000, // 25 seconds for "Could you briefly describe your career objective?"
     10000, // 30 seconds for "What are your strongest skills related to this role?"
     5000, // 30 seconds for "Where did you work most recently, and what was your role?"
-    7000, // 35 seconds for "What were your main responsibilities at your last job?"
-    10000, // 30 seconds for "Could you describe your educational background?"
+    10000, // 35 seconds for "What were your main responsibilities at your last job?"
+    15000, // 30 seconds for "Could you describe your educational background?"
     5000, // 25 seconds for "What certifications or additional training do you have?"
     5000, // 20 seconds for "How many years of experience do you have in your field?"
-    5000, // 25 seconds for "What software or tools are you proficient in?"
+    10000, // 25 seconds for "What software or tools are you proficient in?"
     20000, // 20 seconds for "How can employers contact you (email, phone number)?"
   ];
 
@@ -209,6 +211,7 @@ const Home = () => {
       );
 
       const refinedData = await refinedResponse.json();
+      console.log("refined Data from chatgpt side=", refinedData);
       const structuredData = JSON.parse(refinedData.choices[0].message.content);
 
       // Pass structured data to generateResumePDF
@@ -223,16 +226,18 @@ const Home = () => {
   }
 
   async function checkLogin() {
+    console.log("checking login creds");
     const token = localStorage.getItem("token");
     if (!token) {
       console.log("No token available, skipping verification.");
       return; // Skip the verification if there's no token
     }
     await axios
-      .get(`${process.env.BACKEND_URI}/api/verification/verifyUser`, {
+      .get(`${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`, {
         headers: {
           Authorization: `Bearer ${token}`, // Send token in Authorization header
         },
+        withCredentials: true,
       })
       .then(() => {
         navigate("/jobs");
@@ -241,7 +246,13 @@ const Home = () => {
         console.log("error=", error);
       });
   }
-  checkLogin();
+  useEffect(() => {
+    // Ensure that getJobs is called only once using the ref
+    if (!hasCalledCheckLogin.current) {
+      checkLogin();
+      hasCalledCheckLogin.current = true;
+    }
+  });
 
   return (
     <div>
