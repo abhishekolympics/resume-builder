@@ -7,10 +7,10 @@ import { dotStream } from "ldrs";
 
 dotStream.register();
 
-function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle }) {
+function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle, userId }) {
   const location = useLocation();
   let receivedEmail = location.state?.storedEmail;
-  let id = location.state?.id || null;
+  let id = location.state?.userId || null;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
   const [jobs, setJobs] = useState([]);

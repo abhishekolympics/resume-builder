@@ -19,12 +19,15 @@ const Login = () => {
         return; // Skip the verification if there's no token
       }
       await axios
-        .get(`${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Send token in Authorization header
-          },
-          withCredentials: true,
-        })
+        .get(
+          `${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Send token in Authorization header
+            },
+            withCredentials: true,
+          }
+        )
         .then(() => {
           navigate("/jobs");
         })
@@ -45,7 +48,7 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
-      navigate("/jobs",);
+      navigate("/jobs", { state: { userId: response.data.userId } });
     } catch (error) {
       setMessage(error.response ? error.response.data : "Login failed");
     }
