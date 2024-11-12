@@ -21,7 +21,10 @@ const stopRecording = async (
   setIsActive,
   speakQuestion,
   handleCompleteConversation,
-  currentQuestion
+  currentQuestion,
+  currentMaxTimeRef,
+  recordingStartedRef,
+  recordingStoppedRef
 ) => {
   if (mediaRecorderRef.current) {
     cleanup(maxRecordingTimeoutRef, recordingTimerRef);
@@ -81,7 +84,10 @@ const stopRecording = async (
               setIsActive,
               speakQuestion,
               handleCompleteConversation,
-              currentQuestion
+              currentQuestion,
+              currentMaxTimeRef,
+              recordingStartedRef,
+              recordingStoppedRef
             );
           }, 1000);
         } else {

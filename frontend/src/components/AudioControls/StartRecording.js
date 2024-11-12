@@ -19,7 +19,10 @@ const startRecording = async (
   setIsActive,
   speakQuestion,
   handleCompleteConversation,
-  currentQuestion
+  currentQuestion,
+  currentMaxTimeRef,
+  recordingStartedRef,
+  recordingStoppedRef
 ) => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -40,6 +43,9 @@ const startRecording = async (
     }, 1000);
 
     const currentMaxTime = maxRecordingTimes[currentQuestionRef.current];
+    currentMaxTimeRef.current = currentMaxTime;
+    recordingStartedRef.current= false;
+    recordingStoppedRef.current = true;
     maxRecordingTimeoutRef.current = setTimeout(() => {
       stopRecording(
         text,
@@ -62,7 +68,10 @@ const startRecording = async (
         setIsActive,
         speakQuestion,
         handleCompleteConversation,
-        currentQuestion
+        currentQuestion,
+        currentMaxTimeRef,
+        recordingStartedRef,
+        recordingStoppedRef
       );
     }, currentMaxTime);
     const audioContext = new AudioContext();

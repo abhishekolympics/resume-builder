@@ -59,6 +59,14 @@ const Home = () => {
     20000, // 20 seconds for "How can employers contact you (email, phone number)?"
   ];
 
+  const currentMaxTimeRef = useRef(0);
+  const recordingStartedRef = useRef(false);
+  const recordingStoppedRef = useRef(true);
+
+  function timer() {
+    currentMaxTimeRef -= 1;
+  }
+
   const currentQuestionRef = useRef(currentQuestion);
 
   // Stop recording and process audio
@@ -91,7 +99,10 @@ const Home = () => {
       setIsActive,
       speakQuestion,
       handleCompleteConversation,
-      currentQuestion
+      currentQuestion,
+      currentMaxTimeRef,
+      recordingStartedRef,
+      recordingStoppedRef
     );
   };
 
@@ -420,6 +431,43 @@ const Home = () => {
     }
   });
 
+  // Timer logic
+  useEffect(() => {
+    let timerInterval = null;
+
+    if (isRecording && recordingStartedRef.current) {
+      setRecordingTime(currentMaxTimeRef.current);
+      recordingStartedRef.current = false; // Reset start ref after countdown begins
+
+      timerInterval = setInterval(() => {
+        setRecordingTime((prevTime) => {
+          if (prevTime > 0) {
+            return prevTime - 1;
+          } else {
+            clearInterval(timerInterval);
+            recordingStoppedRef.current = true; // Signal recording stopped
+            return 0;
+          }
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(timerInterval);
+  }, [
+    isRecording,
+    currentMaxTimeRef,
+    recordingStartedRef,
+    recordingStoppedRef,
+  ]);
+
+  // To reset timer when recording stops
+  useEffect(() => {
+    if (recordingStoppedRef.current) {
+      setRecordingTime(0); // Reset display
+      recordingStoppedRef.current = false;
+    }
+  }, [recordingStoppedRef]);
+
   return (
     <div>
       <Navbar pageName={"Home"} />
@@ -432,28 +480,34 @@ const Home = () => {
         </div>
 
         {isActive && (
-          <div>
-            {isBotSpeaking && isRecording ? (
-              <img
-                src={BotSpeaking}
-                alt="Bot is speaking"
-                height={100}
-                width={100}
-              />
-            ) : !isBotSpeaking ? (
-              <div>
+            <div>
+              {isBotSpeaking && isRecording ? (
                 <img
-                  src={RecordingGif}
-                  alt="recording is on"
+                  src={BotSpeaking}
+                  alt="Bot is speaking"
                   height={100}
                   width={100}
                 />
-              </div>
-            ) : (
-              <p>Processing...</p>
-            )}
-          </div>
-        )}
+              ) : !isBotSpeaking ? (
+                <div>
+                  <img
+                    src={RecordingGif}
+                    alt="recording is on"
+                    height={100}
+                    width={100}
+                  />
+                </div>
+              ) : (
+                <p>Processing...</p>
+              )}
+
+              <p>S</p>
+            </div>
+          ) && (
+            <div className="timer">
+              <p>{recordingTime}</p>
+            </div>
+          )}
       </div>
       {!isActive && (
         <div className="homePage">

@@ -21,7 +21,10 @@ const speakQuestion = async (
   setIsActive,
   speakQuestion,
   handleCompleteConversation,
-  currentQuestion
+  currentQuestion,
+  currentMaxTimeRef,
+  recordingStartedRef,
+  recordingStoppedRef
 ) => {
   try {
     audioChunksRef.current = [];
@@ -45,6 +48,7 @@ const speakQuestion = async (
 
     audio.onended = () => {
       setIsBotSpeaking(false);
+      recordingStartedRef.current = true;
       startRecording(
         text,
         setIsBotSpeaking,
@@ -66,7 +70,10 @@ const speakQuestion = async (
         setIsActive,
         speakQuestion,
         handleCompleteConversation,
-        currentQuestion
+        currentQuestion,
+        currentMaxTimeRef,
+        recordingStartedRef,
+        recordingStoppedRef
       );
     };
 
