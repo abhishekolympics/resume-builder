@@ -58,3 +58,15 @@
 .profile-form button:hover {
     background-color: #218838;
 }
+
+
+@media (max-width: 768px) {
+    .main-profile-container {
+      margin: 20px;
+    }
+  
+    .profile-container {
+      width: 90%;
+      margin: 10px auto;
+    }
+  }
