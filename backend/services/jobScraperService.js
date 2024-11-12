@@ -1,6 +1,26 @@
 const puppeteer = require("puppeteer");
 const axios = require("axios");
 
+async function getDynamicSiteKey(page) {
+  // Wait until the global object gdGlobals or GD is defined and publicKeyForUserAuth is available
+  await page.waitForFunction(
+    "window.GD && window.GD.page && window.GD.page.recaptcha && window.GD.page.recaptcha.publicKeyForUserAuth",
+    { timeout: 5000 }
+  );
+
+  // Extract the publicKeyForUserAuth (siteKey)
+  const siteKey = await page.evaluate(
+    () => window.GD.page.recaptcha.publicKeyForUserAuth
+  );
+
+  if (!siteKey) {
+    throw new Error("Failed to retrieve reCAPTCHA site key.");
+  }
+
+  console.log("Extracted siteKey:", siteKey);
+  return siteKey;
+}
+
 async function solveCaptcha(page, siteUrl, siteKey, apiKey) {
   console.log("Attempting to solve captcha...");
 
@@ -156,9 +176,12 @@ async function scrapeWithCaptchaSolving(page, searchTerm) {
       console.log(
         "Captcha detected. Implement a third-party captcha-solving service here."
       );
-      const siteKey = "6Lej8UwUAAAAANV3V5Ow5gJo2-pHj9p5ko8igIe-"; // Replace with the actual reCAPTCHA site key found in the page source
-      const apiKey = process.env.CAPTCHA_API_KEY;
+      const siteKey = await getDynamicSiteKey(page); // Replace with the actual reCAPTCHA site key found in the page source
+
+      console.log("Dynamic siteKey retrieved:", siteKey);
       
+      const apiKey = process.env.CAPTCHA_API_KEY;
+
       await solveCaptcha(page, siteUrl, siteKey, apiKey);
     }
 
