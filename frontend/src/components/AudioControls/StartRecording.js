@@ -23,8 +23,6 @@ const startRecording = async (
 ) => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    console.log("stream=", stream);
-    console.log("audion chunks array=", audioChunksRef);
     audioChunksRef.current = [];
 
     const mediaRecorder = new MediaRecorder(stream);

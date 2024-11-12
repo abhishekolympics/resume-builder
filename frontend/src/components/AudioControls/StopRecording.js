@@ -35,11 +35,6 @@ const stopRecording = async (
         type: "audio/webm",
       });
       audioChunksRef.current = []; // Clear chunks after each recording
-      console.log("inside stop=", audioChunksRef.current);
-
-      // Log blob type and size for debugging
-      console.log("Audio blob type:", audioBlob.type);
-      console.log("Audio blob size:", audioBlob.size);
 
       // Process audio if it has the correct type
       if (audioBlob.size > 0 && audioBlob.type === "audio/webm") {
@@ -47,11 +42,6 @@ const stopRecording = async (
           audioBlob,
           questions[currentQuestionRef.current]
         ); // Pass currentQuestion
-
-        console.log(
-          "current question before processing=",
-          questions[currentQuestionRef.current]
-        );
 
         const newResult = {
           question: questions[currentQuestionRef.current],
