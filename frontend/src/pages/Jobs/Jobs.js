@@ -127,10 +127,10 @@ function Jobs({ name, storedEmail = "onthewayabhishek@gmail.com", jobTitle, user
             {jobs.map((job, index) => (
               <li key={index}>
                 <h2
-                  onClick={() => jobClickHandler(job.link)}
+                  onClick={() => jobClickHandler(job.jobLink)}
                   style={{ cursor: "pointer", color: "blue" }}
                 >
-                  {job.title}
+                  {job.jobName}
                 </h2>
               </li>
             ))}
