@@ -9,7 +9,7 @@ export const questions = [
   "What certifications or additional training do you have?",
   "How many years of experience do you have in your field?",
   "What software or tools are you proficient in?",
-  "How can employers contact you (email, phone number)?",
+  "How can employers contact you? Please provide your phone number and spell out each letter of your email address to avoid any confusion.",
 ];
 
 export const maxRecordingTimes = [
