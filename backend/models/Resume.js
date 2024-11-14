@@ -38,6 +38,11 @@ const resumeSchema = new mongoose.Schema(
       phoneNumber: String,
       emailAddress: String,
     },
+    userid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );
