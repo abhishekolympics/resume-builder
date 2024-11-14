@@ -147,38 +147,6 @@ function Profile() {
   }
   console.log("showlogout in profile=", showLogout.current);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-
-    // Create an object to store only the updated fields
-    const updatedData = {};
-    for (const key in profileData) {
-      if (profileData[key] !== "") {
-        // Check if the value is not empty
-        updatedData[key] = profileData[key];
-      }
-    }
-
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URI}/api/resume/update`,
-        updatedData
-      );
-
-      if (response.status === 200) {
-        console.log("Profile updated successfully!");
-        // Optionally, update local state with the updated data
-        // setProfileData(response.data); // Assuming response contains updated data
-      } else {
-        console.error("Error updating profile:", response.data.message);
-        // Handle error gracefully, e.g., display an error message to the user
-      }
-    } catch (error) {
-      console.error("Error sending update request:", error);
-      // Handle errors gracefully
-    }
-  };
-
   return (
     <div className="main-profile-container">
       <Navbar
@@ -193,7 +161,7 @@ function Profile() {
       />
       <div className="profile-container">
         <h2>Profile Page</h2>
-        <form className="profile-form" onSubmit={handleSubmit}>
+        <form className="profile-form">
           <label>Full Name:</label>
           <input
             type="text"
