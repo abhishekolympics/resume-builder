@@ -20,6 +20,7 @@ const Home = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [processingResults, setProcessingResults] = useState([]);
   const [isBotSpeaking, setIsBotSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const maxRecordingTimeoutRef = useRef(null);
@@ -68,7 +69,8 @@ const Home = () => {
       currentQuestion,
       currentMaxTimeRef,
       recordingStartedRef,
-      recordingStoppedRef
+      recordingStoppedRef,
+      setIsRecording
     );
   };
 
@@ -249,11 +251,13 @@ const Home = () => {
       <Navbar pageName={"Home"} />
       <div className="homePage">
         <h1>AI Resume Generator</h1>
-        <div>
-          <button onClick={startConversation} disabled={isActive}>
-            Start Conversation
-          </button>
-        </div>
+        {!isActive && (
+          <div>
+            <button onClick={startConversation} disabled={isActive}>
+              Start Conversation
+            </button>
+          </div>
+        )}
 
         {isActive && (
           <div>
@@ -264,7 +268,7 @@ const Home = () => {
                 height={100}
                 width={100}
               />
-            ) : !isBotSpeaking ? (
+            ) : isRecording ? (
               <div>
                 <img
                   src={RecordingGif}
@@ -272,10 +276,6 @@ const Home = () => {
                   height={100}
                   width={100}
                 />
-                <h3>
-                  Timer:- {recordingTime}/
-                  {Number(maxRecordingTimes[currentQuestion]) / 1000} sec
-                </h3>
               </div>
             ) : (
               <p>Processing...</p>

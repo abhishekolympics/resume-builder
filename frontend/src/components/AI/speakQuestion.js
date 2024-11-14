@@ -23,7 +23,8 @@ const speakQuestion = async (
   currentQuestion,
   currentMaxTimeRef,
   recordingStartedRef,
-  recordingStoppedRef
+  recordingStoppedRef,
+  setIsRecording
 ) => {
   try {
     audioChunksRef.current = [];
@@ -71,7 +72,8 @@ const speakQuestion = async (
         currentQuestion,
         currentMaxTimeRef,
         recordingStartedRef,
-        recordingStoppedRef
+        recordingStoppedRef,
+        setIsRecording
       );
     };
 

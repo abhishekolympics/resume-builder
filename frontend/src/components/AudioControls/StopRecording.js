@@ -25,7 +25,8 @@ const stopRecording = async (
   currentQuestion,
   currentMaxTimeRef,
   recordingStartedRef,
-  recordingStoppedRef
+  recordingStoppedRef,
+  setIsRecording
 ) => {
   if (myvad.audioNodeVAD && typeof myvad.audioNodeVAD.pause === "function") {
     myvad.audioNodeVAD.pause();
@@ -88,7 +89,8 @@ const stopRecording = async (
             currentQuestion,
             currentMaxTimeRef,
             recordingStartedRef,
-            recordingStoppedRef
+            recordingStoppedRef,
+            setIsRecording
           );
         }, 500); // Adjust delay as needed
       } else {

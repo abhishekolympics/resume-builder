@@ -2,7 +2,9 @@ import { loadVAD } from "./vad"; // Assuming VAD is available
 import * as lame from "@breezystack/lamejs";
 import processAudio from "../AI/processAudio";
 
-async function convertToMP3(audioData, sampleRate) {
+async function convertToMP3(audioData, sampleRate, setIsRecording) {
+  setIsRecording(false);
+
   // If audioData is empty, return an empty MP3 blob
   if (audioData.length === 0) {
     console.error("Audio data is empty, skipping MP3 conversion.");
@@ -61,7 +63,8 @@ const startRecording = async (
   currentQuestion,
   currentMaxTimeRef,
   recordingStartedRef,
-  recordingStoppedRef
+  recordingStoppedRef,
+  setIsRecording
 ) => {
   try {
     // Initialize VAD
@@ -70,13 +73,13 @@ const startRecording = async (
     // Set up VAD callbacks
     const myvad = await vad.MicVAD.new({
       onSpeechStart: () => {
-        setIsBotSpeaking(true);
+        setIsBotSpeaking(false);
       },
       onSpeechEnd: async (audio) => {
         setIsBotSpeaking(false);
 
         // Convert the captured audio to MP3 after speech ends
-        const mp3Blob = await convertToMP3(audio, 16000); // 16000 is a sample rate example
+        const mp3Blob = await convertToMP3(audio, 16000, setIsRecording); // 16000 is a sample rate example
 
         // Call stopRecording with MP3 blob
         stopRecording(
@@ -104,7 +107,8 @@ const startRecording = async (
           currentQuestion,
           currentMaxTimeRef,
           recordingStartedRef,
-          recordingStoppedRef
+          recordingStoppedRef,
+          setIsRecording
         );
       },
     });
@@ -112,6 +116,10 @@ const startRecording = async (
     if (myvad.audioNodeVAD && typeof myvad.audioNodeVAD.start === "function") {
       myvad.audioNodeVAD.start();
       console.log("VAD started");
+      setTimeout(() => {
+        setIsBotSpeaking(false);
+        setIsRecording(true);
+      }, 1000); // 1000ms = 1 second
     } else {
       console.error("Start method is not available on audioNodeVAD.");
     }
