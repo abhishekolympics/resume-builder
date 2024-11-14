@@ -2,10 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Profile.css";
 import Navbar from "../../components/Navbar/Navbar";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Profile() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const userId = location.state?.passedId;
+  console.log("id recieved from state", userId);
+
   const [profileData, setProfileData] = useState({
     fullName: "Abhishek",
     email: "onthewayabhishek@gmail.com",
@@ -18,6 +22,8 @@ function Profile() {
     yearsOfExperience: 5,
     proficiency: "React, Node.js, MongoDB",
     contact: "onthewayabhishek@gmail.com",
+    userId: null,
+    jobTitle: "Full-Stack Developer",
   });
 
   const showLogout = useRef(false);
@@ -50,7 +56,8 @@ function Profile() {
             },
           }
         )
-        .then(() => {
+        .then((response) => {
+          initialEmail.current = response.data.email;
           showLogout.current = true;
           showLogin.current = false;
         })
@@ -70,7 +77,11 @@ function Profile() {
         );
         console.log("response from getdata in profile page=", response);
 
-        if (response.data.profile && response.data.profile.length > 0) {
+        if (
+          response.data.profile &&
+          response.data.profile.length > 0 &&
+          response.data.profile[0].userId
+        ) {
           const profile = response.data.profile[0];
           setProfileData({
             fullName: profile.fullName || "",
@@ -91,6 +102,8 @@ function Profile() {
             yearsOfExperience: profile.yearsOfExperience || 0,
             proficiency: profile.proficiency || "", // Use optional chaining
             contact: profile.contactInfo.phoneNumber || "",
+            userId: profile.userId || null,
+            jobTitle: profile.jobTitle || null,
           });
         }
       } catch (error) {
@@ -103,7 +116,22 @@ function Profile() {
   }, [navigate]); // Empty array ensures it only runs once
 
   function handleJobs() {
-    navigate("/jobs");
+    console.log(
+      "values which are being passed are as follows:",
+      profileData.userId,
+      profileData.jobTitle,
+      profileData.fullName,
+      profileData.email
+    );
+
+    navigate("/jobs", {
+      state: {
+        userId: profileData.userId,
+        jobTitle: profileData.jobTitle,
+        name: profileData.fullName,
+        storedEmail: profileData.email,
+      },
+    });
   }
 
   function onLogout() {
@@ -112,16 +140,50 @@ function Profile() {
     console.log("showlogout in onlogout=", showLogout.current);
     showLogin.current = true;
     console.log("showlogin in onlogout=", showLogin.current);
+    navigate("/");
   }
   function onLogin() {
     navigate("/login");
   }
   console.log("showlogout in profile=", showLogout.current);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Create an object to store only the updated fields
+    const updatedData = {};
+    for (const key in profileData) {
+      if (profileData[key] !== "") {
+        // Check if the value is not empty
+        updatedData[key] = profileData[key];
+      }
+    }
+
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URI}/api/resume/update`,
+        updatedData
+      );
+
+      if (response.status === 200) {
+        console.log("Profile updated successfully!");
+        // Optionally, update local state with the updated data
+        // setProfileData(response.data); // Assuming response contains updated data
+      } else {
+        console.error("Error updating profile:", response.data.message);
+        // Handle error gracefully, e.g., display an error message to the user
+      }
+    } catch (error) {
+      console.error("Error sending update request:", error);
+      // Handle errors gracefully
+    }
+  };
+
   return (
     <div className="main-profile-container">
       <Navbar
         pageName={"Profile"}
+        username={profileData.fullName.split(' ')[0]}
         showJobs={true}
         handleJobs={handleJobs}
         showLogout={showLogout.current}
@@ -131,7 +193,7 @@ function Profile() {
       />
       <div className="profile-container">
         <h2>Profile Page</h2>
-        <form className="profile-form">
+        <form className="profile-form" onSubmit={handleSubmit}>
           <label>Full Name:</label>
           <input
             type="text"

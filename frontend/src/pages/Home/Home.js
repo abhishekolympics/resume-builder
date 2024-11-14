@@ -117,7 +117,7 @@ const Home = () => {
       console.log("structured data from chatgpt side=", structuredData);
 
       // Pass structured data to generateResumePDF
-      generateResumePDF({ structuredData, navigate });
+      generateResumePDF(structuredData, navigate);
     } catch (error) {
       console.error("Error refining data with OpenAI:", error);
     }
@@ -127,24 +127,52 @@ const Home = () => {
     navigate("/login");
   }
 
-  async function checkLogin() {
+  function checkLogin() {
     console.log("checking login creds");
     const token = localStorage.getItem("token");
     if (!token) {
       console.log("No token available, skipping verification.");
       return; // Skip the verification if there's no token
     }
-    await axios
+    axios
       .get(`${process.env.REACT_APP_BACKEND_URI}/api/verification/verifyUser`, {
         headers: {
           Authorization: `Bearer ${token}`, // Send token in Authorization header
         },
         withCredentials: true,
       })
-      .then(() => {
-        navigate("/jobs");
+      .then((response) => {
+        console.log(
+          "response in homepage for checkLogin=",
+          response.data.email
+        );
+
+        axios
+          .get(`${process.env.REACT_APP_BACKEND_URI}/api/resume/profile`, {
+            params: { email: response.data.email }, // Use the email from useRef
+          })
+          .then((profileResponse) => {
+            console.log(
+              "profile recieved succesfully=",
+              profileResponse.data.profile
+            );
+
+            const name = profileResponse.data.profile[0].fullName;
+            const userId = profileResponse.data.profile[0]._id;
+            const jobTitle = profileResponse.data.profile[0].jobTitle;
+            const storedEmail = profileResponse.data.profile[0].email;
+            navigate("/jobs", {
+              state: {
+                name,
+                storedEmail,
+                jobTitle,
+                userId,
+              },
+            });
+          });
       })
       .catch((error) => {
+        localStorage.removeItem("token");
         console.log("error=", error);
       });
   }
@@ -156,6 +184,65 @@ const Home = () => {
     }
   });
 
+  // function onButtonClick() {
+  //   const structuredData = {
+  //     fullName: "John Doe",
+  //     email: "johndoe@example.com",
+  //     jobTitle: "Full Stack Developer",
+  //     careerObjective: "Passionate about building scalable web applications and learning new technologies.",
+  //     skills: ["JavaScript", "React", "Node.js", "MongoDB"],
+  //     recentJob: "Full Stack Developer at Tech Solutions Inc.",
+  //     experience: [
+  //       {
+  //         company: "Tech Solutions Inc.",
+  //         position: "Software Engineer",
+  //         startDate: new Date("2022-01-01"),
+  //         endDate: new Date("2023-12-31"),
+  //         responsibilities: "Developed and maintained web applications using React and Node.js.",
+  //       },
+  //       {
+  //         company: "WebWorks",
+  //         position: "Junior Developer",
+  //         startDate: new Date("2020-06-01"),
+  //         endDate: new Date("2021-12-31"),
+  //         responsibilities: "Assisted in developing front-end components with React.",
+  //       },
+  //     ],
+  //     education: [
+  //       {
+  //         degree: "Bachelor of Science in Computer Science",
+  //         institution: "University of California, Berkeley",
+  //       },
+  //       {
+  //         degree: "Master of Science in Software Engineering",
+  //         institution: "Stanford University",
+  //       },
+  //     ],
+  //     certifications: "Certified JavaScript Developer from Udemy.com",
+  //     yearsOfExperience: "3 years",
+  //     proficiency: "Proficient in JavaScript, React, Node.js, MongoDB, Git, Docker.",
+  //     projects: [
+  //       {
+  //         projectName: "Personal Portfolio",
+  //         description: "A personal website to showcase my projects and skills.",
+  //         technologiesUsed: ["HTML", "CSS", "JavaScript", "React"],
+  //       },
+  //       {
+  //         projectName: "E-commerce App",
+  //         description: "An e-commerce platform built using React and Node.js.",
+  //         technologiesUsed: ["React", "Node.js", "MongoDB", "Express"],
+  //       },
+  //     ],
+  //     contactInfo: {
+  //       phoneNumber: "123-456-7890",
+  //       emailAddress: "johndoe@example.com",
+  //     },
+  //   };
+
+  //   console.log(structuredData);
+
+  //   generateResumePDF(structuredData, navigate);
+  // }
 
   return (
     <div>
@@ -202,6 +289,7 @@ const Home = () => {
           <button onClick={handleOnLogin}>LOGIN</button>
         </div>
       )}
+      {/* <button onClick={onButtonClick}>buttoner</button> */}
     </div>
   );
 };

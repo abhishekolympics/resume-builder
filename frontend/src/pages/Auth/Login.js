@@ -48,7 +48,31 @@ const Login = () => {
         }
       );
       localStorage.setItem("token", response.data.token);
-      navigate("/jobs", { state: { userId: response.data.userId } });
+      console.log("response in login = ", response);
+      const profileResponse = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URI}/api/resume/profile`,
+        {
+          params: { email }, // Use the email from useRef
+        }
+      );
+
+      console.log(
+        "profile recieved succesfully=",
+        profileResponse.data.profile
+      );
+
+      const name = profileResponse.data.profile[0].fullName;
+      const userId = profileResponse.data.profile[0]._id;
+      const jobTitle = profileResponse.data.profile[0].jobTitle;
+      const storedEmail = profileResponse.data.profile[0].email;
+      navigate("/jobs", {
+        state: {
+          name,
+          storedEmail,
+          jobTitle,
+          userId,
+        },
+      });
     } catch (error) {
       setMessage(error.response ? error.response.data : "Login failed");
     }

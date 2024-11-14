@@ -7,20 +7,24 @@ import { dotStream } from "ldrs";
 
 dotStream.register();
 
-function Jobs({
-  name,
-  storedEmail = "onthewayabhishek@gmail.com",
-  jobTitle,
-  userId,
-}) {
+function Jobs() {
   const location = useLocation();
-  let receivedEmail = location.state?.storedEmail;
+  let receivedEmail = location.state?.storedEmail || null;
   let id = location.state?.userId || null;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isNotLoggedIn, setIsNotLoggedIn] = useState(false);
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
   const searchTerm = location.state?.jobTitle || "web developer";
+  const storedName = location.state?.name.split(" ")[0] || null;
+
+  console.log(
+    "received values in jobs are =",
+    storedName,
+    receivedEmail,
+    id,
+    searchTerm
+  );
 
   // Ref to track if getJobs has been called
   const hasCalledGetJobs = useRef(false);
@@ -87,7 +91,8 @@ function Jobs({
   }
 
   function goToProfilePage() {
-    navigate("/profile");
+    // console.log("passed id =",id);
+    navigate("/profile", { state: { passedId: id } });
   }
 
   function logoutUser() {
@@ -109,11 +114,11 @@ function Jobs({
     navigate("/login", { state: { receivedEmail } });
   }
 
-  console.log('jobs =',jobs);
+  console.log("jobs =", jobs);
   return (
     <div>
       <Navbar
-        username={name}
+        username={storedName}
         showProfile={true}
         pageName="Jobs"
         onLogout={logoutUser}
