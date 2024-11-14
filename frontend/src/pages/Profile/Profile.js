@@ -26,7 +26,8 @@ function Profile() {
     jobTitle: "Full-Stack Developer",
   });
 
-  const showLogout = useRef(false);
+  // const showLogout = useRef(false);
+  const [showLogout,setShowLogout] = useState(false);
   const showLogin = useRef(true);
 
   // Only useRef for values that are persistent but don't need to trigger re-renders
@@ -58,7 +59,8 @@ function Profile() {
         )
         .then((response) => {
           initialEmail.current = response.data.email;
-          showLogout.current = true;
+          // showLogout.current = true;
+          setShowLogout(true);
           showLogin.current = false;
         })
         .catch((error) => {
@@ -136,8 +138,10 @@ function Profile() {
 
   function onLogout() {
     localStorage.removeItem("token");
-    showLogout.current = false;
-    console.log("showlogout in onlogout=", showLogout.current);
+    // showLogout.current = false;
+    setShowLogout(false);
+    // console.log("showlogout in onlogout=", showLogout.current);
+    console.log("showlogout in onlogout=", showLogout);
     showLogin.current = true;
     console.log("showlogin in onlogout=", showLogin.current);
     navigate("/");
@@ -145,7 +149,8 @@ function Profile() {
   function onLogin() {
     navigate("/login");
   }
-  console.log("showlogout in profile=", showLogout.current);
+  // console.log("showlogout in profile=", showLogout.current);
+  console.log("showlogout in profile=", showLogout);
 
   return (
     <div className="main-profile-container">
@@ -154,7 +159,8 @@ function Profile() {
         username={profileData.fullName.split(' ')[0]}
         showJobs={true}
         handleJobs={handleJobs}
-        showLogout={showLogout.current}
+        // showLogout={showLogout.current}
+        showLogout={showLogout}
         onLogout={onLogout}
         showLogin={showLogin.current}
         onLogin={onLogin}
