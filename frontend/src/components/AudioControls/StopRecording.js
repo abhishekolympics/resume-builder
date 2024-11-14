@@ -1,6 +1,8 @@
 import processAudio from "../AI/processAudio";
 
 const stopRecording = async (
+  myvad,
+  mp3Blob,
   text,
   setIsBotSpeaking,
   startRecording,
@@ -25,77 +27,79 @@ const stopRecording = async (
   recordingStartedRef,
   recordingStoppedRef
 ) => {
-  if (mediaRecorderRef.current) {
+  if (myvad.audioNodeVAD && typeof myvad.audioNodeVAD.pause === "function") {
+    myvad.audioNodeVAD.pause();
+    console.log("VAD paused");
+  } else {
+    console.error("Pause method is not available on audioNodeVAD.");
+  }
+  cleanup(maxRecordingTimeoutRef, recordingTimerRef);
+
+  try {
     cleanup(maxRecordingTimeoutRef, recordingTimerRef);
+    if (mp3Blob && mp3Blob.size > 0) {
+      // Process the MP3 audio data
+      const { text, processed } = await processAudio(
+        mp3Blob,
+        questions[currentQuestionRef.current]
+      );
 
-    mediaRecorderRef.current.stop();
+      // Save the result
+      const newResult = {
+        question: questions[currentQuestionRef.current],
+        answer: text,
+        processed,
+      };
 
-    // Check and reset audioChunksRef
-    if (audioChunksRef.current.length > 0) {
-      const audioBlob = new Blob(audioChunksRef.current, {
-        type: "audio/webm",
-      });
-      audioChunksRef.current = []; // Clear chunks after each recording
+      processingResultsRef.current.push(newResult);
+      setProcessingResults([...processingResultsRef.current]);
 
-      // Process audio if it has the correct type
-      if (audioBlob.size > 0 && audioBlob.type === "audio/webm") {
-        const { text, processed } = await processAudio(
-          audioBlob,
-          questions[currentQuestionRef.current]
-        ); // Pass currentQuestion
+      // Check if there are more questions
+      if (currentQuestionRef.current < questions.length - 1) {
+        // Proceed to the next question
+        setCurrentQuestion((prev) => {
+          const nextQuestion = prev + 1;
+          currentQuestionRef.current = nextQuestion;
+          return nextQuestion;
+        });
 
-        const newResult = {
-          question: questions[currentQuestionRef.current],
-          answer: text,
-          processed,
-        };
-
-        processingResultsRef.current.push(newResult);
-
-        setProcessingResults([...processingResultsRef.current]);
-
-        if (currentQuestionRef.current < questions.length - 1) {
-          setCurrentQuestion((prev) => {
-            const newQuestion = prev + 1;
-            currentQuestionRef.current = newQuestion; // Update the ref here
-            return newQuestion;
-          });
-          setTimeout(() => {
-            speakQuestion(
-              questions[currentQuestionRef.current],
-              setIsBotSpeaking,
-              startRecording,
-              audioChunksRef,
-              mediaRecorderRef,
-              setRecordingTime,
-              recordingTimerRef,
-              maxRecordingTimes,
-              currentQuestionRef,
-              maxRecordingTimeoutRef,
-              stopRecording,
-              cleanup,
-              questions,
-              processingResultsRef,
-              setProcessingResults,
-              setCurrentQuestion,
-              setIsActive,
-              speakQuestion,
-              handleCompleteConversation,
-              currentQuestion,
-              currentMaxTimeRef,
-              recordingStartedRef,
-              recordingStoppedRef
-            );
-          }, 1000);
-        } else {
-          await handleCompleteConversation(processingResultsRef);
-        }
+        // Wait a moment before asking the next question
+        setTimeout(() => {
+          speakQuestion(
+            questions[currentQuestionRef.current],
+            setIsBotSpeaking,
+            startRecording,
+            audioChunksRef,
+            mediaRecorderRef, // Remove reference in future
+            setRecordingTime,
+            recordingTimerRef,
+            maxRecordingTimes,
+            currentQuestionRef,
+            maxRecordingTimeoutRef,
+            stopRecording,
+            cleanup,
+            questions,
+            processingResultsRef,
+            setProcessingResults,
+            setCurrentQuestion,
+            setIsActive,
+            speakQuestion,
+            handleCompleteConversation,
+            currentQuestion,
+            currentMaxTimeRef,
+            recordingStartedRef,
+            recordingStoppedRef
+          );
+        }, 500); // Adjust delay as needed
       } else {
-        console.error("Invalid audio format detected.");
+        // End conversation if it's the last question
+        await handleCompleteConversation(processingResultsRef);
       }
     } else {
-      console.error("No audio data recorded.");
+      console.error("No valid audio blob received.");
     }
+  } catch (error) {
+    console.error("Error in stopRecording:", error);
   }
 };
 
