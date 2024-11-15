@@ -35,8 +35,6 @@ async function convertToMP3(audioData, sampleRate, setIsRecording) {
 
   const data = new Blob(mp3Data, { type: "audio/mp3" });
 
-  const convertedText = await processAudio(data, "extract the original text");
-  console.log("converted text is ", convertedText);
   return new Blob(mp3Data, { type: "audio/mp3" });
 }
 
