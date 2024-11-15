@@ -17,6 +17,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  // eslint-disable-next-line no-unused-vars
   const [recordingTime, setRecordingTime] = useState(0);
   const [processingResults, setProcessingResults] = useState([]);
   const [isBotSpeaking, setIsBotSpeaking] = useState(false);

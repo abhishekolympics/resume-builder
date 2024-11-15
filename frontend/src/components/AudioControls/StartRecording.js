@@ -1,6 +1,5 @@
 import { loadVAD } from "./vad"; // Assuming VAD is available
 import * as lame from "@breezystack/lamejs";
-import processAudio from "../AI/processAudio";
 
 async function convertToMP3(audioData, sampleRate, setIsRecording) {
   setIsRecording(false);
@@ -32,8 +31,6 @@ async function convertToMP3(audioData, sampleRate, setIsRecording) {
 
   const end = mp3Encoder.flush();
   mp3Data.push(end);
-
-  const data = new Blob(mp3Data, { type: "audio/mp3" });
 
   return new Blob(mp3Data, { type: "audio/mp3" });
 }
